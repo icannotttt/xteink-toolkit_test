@@ -12,6 +12,9 @@ using XTEinkTools;
 
 namespace XTEinkToolkit
 {
+    // TODO: 允许字体旋转
+    // TODO: 允许横屏预览
+    // TODO: 允许加载TTF字体文件而无需安装
     public partial class FrmMain : Form
     {
         public FrmMain()
@@ -40,6 +43,10 @@ namespace XTEinkToolkit
             {
                 lblFontSource.Font = fontDialog.Font;
                 lblFontSource.Text = fontDialog.Font.Name + "\r\n中国智造，惠及全球ABCabc123";
+                numFontSizePt.ValueChanged -= numFontSizePt_ValueChanged;
+                numFontSizePt.Value = (decimal)fontDialog.Font.Size;
+                numFontSizePt.ValueChanged += numFontSizePt_ValueChanged;
+
             }
             DoPreview();
         }
@@ -120,7 +127,7 @@ namespace XTEinkToolkit
                 Utility.RenderPreview(previewString, fontBinary, renderer, previewSurface.GetGraphics(), previewSurface.CanvasSize);
                 previewSurface.Commit();
             }
-
+            GC.Collect();
             btnPreview.Enabled = true;
             btnPreview.Text = "查看预览";
         }

@@ -316,8 +316,11 @@
             // 
             // fontDialog
             // 
+            this.fontDialog.AllowScriptChange = false;
+            this.fontDialog.AllowVerticalFonts = false;
             this.fontDialog.MaxSize = 72;
             this.fontDialog.MinSize = 8;
+            this.fontDialog.ShowEffects = false;
             // 
             // debounceTimer
             // 
