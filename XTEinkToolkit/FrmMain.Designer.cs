@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.panel1 = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnPreview = new System.Windows.Forms.LinkLabel();
@@ -36,14 +37,20 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.chkVerticalFont = new System.Windows.Forms.CheckBox();
+            this.chkLandspace = new System.Windows.Forms.CheckBox();
+            this.chkTraditionalChinese = new System.Windows.Forms.CheckBox();
             this.chkRenderGridFit = new System.Windows.Forms.CheckBox();
             this.chkRenderAntiAltas = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.numFontGamma = new System.Windows.Forms.TrackBar();
             this.label4 = new System.Windows.Forms.Label();
             this.numLineSpacing = new System.Windows.Forms.NumericUpDown();
             this.numFontSizePt = new System.Windows.Forms.NumericUpDown();
+            this.btnChooseFontFile = new System.Windows.Forms.Button();
             this.btnSelectFont = new System.Windows.Forms.Button();
             this.lblFontSource = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -66,34 +73,22 @@
             // 
             this.panel1.Controls.Add(this.groupBox1);
             this.panel1.Controls.Add(this.panel2);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(8, 8);
+            resources.ApplyResources(this.panel1, "panel1");
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(849, 860);
-            this.panel1.TabIndex = 1;
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.btnPreview);
             this.groupBox1.Controls.Add(this.previewSurface);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(274, 0);
+            resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(8);
-            this.groupBox1.Size = new System.Drawing.Size(575, 860);
-            this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "字体效果预览";
             // 
             // btnPreview
             // 
-            this.btnPreview.AutoSize = true;
-            this.btnPreview.Location = new System.Drawing.Point(95, 0);
+            resources.ApplyResources(this.btnPreview, "btnPreview");
             this.btnPreview.Name = "btnPreview";
-            this.btnPreview.Size = new System.Drawing.Size(65, 20);
-            this.btnPreview.TabIndex = 1;
             this.btnPreview.TabStop = true;
-            this.btnPreview.Text = "查看预览";
             this.btnPreview.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnPreview_LinkClicked);
             // 
             // previewSurface
@@ -101,111 +96,117 @@
             this.previewSurface.BackColor = System.Drawing.Color.Silver;
             this.previewSurface.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.previewSurface.CanvasSize = new System.Drawing.Size(100, 100);
-            this.previewSurface.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.previewSurface.Location = new System.Drawing.Point(8, 27);
-            this.previewSurface.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            resources.ApplyResources(this.previewSurface, "previewSurface");
             this.previewSurface.Name = "previewSurface";
             this.previewSurface.ScaleMode = XTEinkToolkit.Controls.CanvasControl.RenderScaleMode.Zoom;
-            this.previewSurface.Size = new System.Drawing.Size(559, 825);
-            this.previewSurface.TabIndex = 0;
             // 
             // panel2
             // 
             this.panel2.Controls.Add(this.panel3);
             this.panel2.Controls.Add(this.btnDoGeneration);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
+            resources.ApplyResources(this.panel2, "panel2");
             this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(0, 0, 8, 0);
-            this.panel2.Size = new System.Drawing.Size(274, 860);
-            this.panel2.TabIndex = 1;
             // 
             // panel3
             // 
             this.panel3.Controls.Add(this.groupBox2);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 0);
+            resources.ApplyResources(this.panel3, "panel3");
             this.panel3.Name = "panel3";
-            this.panel3.Padding = new System.Windows.Forms.Padding(0, 0, 0, 8);
-            this.panel3.Size = new System.Drawing.Size(266, 815);
-            this.panel3.TabIndex = 2;
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label7);
+            this.groupBox2.Controls.Add(this.chkVerticalFont);
+            this.groupBox2.Controls.Add(this.chkLandspace);
+            this.groupBox2.Controls.Add(this.chkTraditionalChinese);
             this.groupBox2.Controls.Add(this.chkRenderGridFit);
             this.groupBox2.Controls.Add(this.chkRenderAntiAltas);
             this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.numFontGamma);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.numLineSpacing);
             this.groupBox2.Controls.Add(this.numFontSizePt);
+            this.groupBox2.Controls.Add(this.btnChooseFontFile);
             this.groupBox2.Controls.Add(this.btnSelectFont);
             this.groupBox2.Controls.Add(this.lblFontSource);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 0);
+            resources.ApplyResources(this.groupBox2, "groupBox2");
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(266, 807);
-            this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "字体选项";
+            // 
+            // label7
+            // 
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
+            // 
+            // chkVerticalFont
+            // 
+            resources.ApplyResources(this.chkVerticalFont, "chkVerticalFont");
+            this.chkVerticalFont.Name = "chkVerticalFont";
+            this.toolTip1.SetToolTip(this.chkVerticalFont, resources.GetString("chkVerticalFont.ToolTip"));
+            this.chkVerticalFont.UseVisualStyleBackColor = true;
+            this.chkVerticalFont.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
+            // chkLandspace
+            // 
+            resources.ApplyResources(this.chkLandspace, "chkLandspace");
+            this.chkLandspace.Name = "chkLandspace";
+            this.toolTip1.SetToolTip(this.chkLandspace, resources.GetString("chkLandspace.ToolTip"));
+            this.chkLandspace.UseVisualStyleBackColor = true;
+            this.chkLandspace.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
+            // chkTraditionalChinese
+            // 
+            resources.ApplyResources(this.chkTraditionalChinese, "chkTraditionalChinese");
+            this.chkTraditionalChinese.Name = "chkTraditionalChinese";
+            this.toolTip1.SetToolTip(this.chkTraditionalChinese, resources.GetString("chkTraditionalChinese.ToolTip"));
+            this.chkTraditionalChinese.UseVisualStyleBackColor = true;
+            this.chkTraditionalChinese.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
             // chkRenderGridFit
             // 
-            this.chkRenderGridFit.AutoSize = true;
+            resources.ApplyResources(this.chkRenderGridFit, "chkRenderGridFit");
             this.chkRenderGridFit.Checked = true;
             this.chkRenderGridFit.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRenderGridFit.Location = new System.Drawing.Point(100, 395);
             this.chkRenderGridFit.Name = "chkRenderGridFit";
-            this.chkRenderGridFit.Size = new System.Drawing.Size(84, 24);
-            this.chkRenderGridFit.TabIndex = 7;
-            this.chkRenderGridFit.Text = "主干提示";
-            this.toolTip1.SetToolTip(this.chkRenderGridFit, "GDI+字体渲染的一个特性。\r\n主干提示可以根据文字的笔画对渲染进行调整，减少笔画粗细不均匀的情况");
+            this.toolTip1.SetToolTip(this.chkRenderGridFit, resources.GetString("chkRenderGridFit.ToolTip"));
             this.chkRenderGridFit.UseVisualStyleBackColor = true;
             this.chkRenderGridFit.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
             // chkRenderAntiAltas
             // 
-            this.chkRenderAntiAltas.AutoSize = true;
+            resources.ApplyResources(this.chkRenderAntiAltas, "chkRenderAntiAltas");
             this.chkRenderAntiAltas.Checked = true;
             this.chkRenderAntiAltas.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRenderAntiAltas.Location = new System.Drawing.Point(10, 395);
             this.chkRenderAntiAltas.Name = "chkRenderAntiAltas";
-            this.chkRenderAntiAltas.Size = new System.Drawing.Size(84, 24);
-            this.chkRenderAntiAltas.TabIndex = 7;
-            this.chkRenderAntiAltas.Text = "字体平滑";
-            this.toolTip1.SetToolTip(this.chkRenderAntiAltas, "是否开启GDI+字体灰度抗锯齿功能\r\n开启功能并不会真的抗锯齿，只是在内部渲染时允许包含灰度信息。\r\n当开启此功能后，可以调整字体亮度。");
+            this.toolTip1.SetToolTip(this.chkRenderAntiAltas, resources.GetString("chkRenderAntiAltas.ToolTip"));
             this.chkRenderAntiAltas.UseVisualStyleBackColor = true;
             this.chkRenderAntiAltas.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 312);
+            resources.ApplyResources(this.label6, "label6");
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(121, 20);
-            this.label6.TabIndex = 6;
-            this.label6.Text = "行间距（像素）：";
+            // 
+            // label2
+            // 
+            resources.ApplyResources(this.label2, "label2");
+            this.label2.Name = "label2";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 367);
+            resources.ApplyResources(this.label5, "label5");
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(107, 20);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "字体渲染模式：";
             // 
             // numFontGamma
             // 
-            this.numFontGamma.Location = new System.Drawing.Point(6, 264);
+            resources.ApplyResources(this.numFontGamma, "numFontGamma");
             this.numFontGamma.Maximum = 254;
             this.numFontGamma.Minimum = 1;
             this.numFontGamma.Name = "numFontGamma";
-            this.numFontGamma.Size = new System.Drawing.Size(254, 45);
-            this.numFontGamma.TabIndex = 5;
             this.numFontGamma.TickFrequency = 16;
             this.numFontGamma.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.numFontGamma.Value = 127;
@@ -213,26 +214,19 @@
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 241);
+            resources.ApplyResources(this.label4, "label4");
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(135, 20);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "字体亮度（粗细）：";
             // 
             // numLineSpacing
             // 
-            this.numLineSpacing.Location = new System.Drawing.Point(6, 336);
+            resources.ApplyResources(this.numLineSpacing, "numLineSpacing");
             this.numLineSpacing.Maximum = new decimal(new int[] {
             120,
             0,
             0,
             0});
             this.numLineSpacing.Name = "numLineSpacing";
-            this.numLineSpacing.Size = new System.Drawing.Size(254, 26);
-            this.numLineSpacing.TabIndex = 3;
-            this.toolTip1.SetToolTip(this.numLineSpacing, "字体的行间距。\r\n由于阅星曈渲染文字时会向下取整，因此少量调整间距可能不会产生效果。\r\n此时需要调大更多的值才能生效。\r\n这个值也可以理解为行间距至少为多少像素。" +
-        "");
+            this.toolTip1.SetToolTip(this.numLineSpacing, resources.GetString("numLineSpacing.ToolTip"));
             this.numLineSpacing.ValueChanged += new System.EventHandler(this.numLineSpacing_ValueChanged);
             // 
             // numFontSizePt
@@ -243,7 +237,7 @@
             0,
             0,
             65536});
-            this.numFontSizePt.Location = new System.Drawing.Point(6, 210);
+            resources.ApplyResources(this.numFontSizePt, "numFontSizePt");
             this.numFontSizePt.Maximum = new decimal(new int[] {
             72,
             0,
@@ -255,8 +249,6 @@
             0,
             0});
             this.numFontSizePt.Name = "numFontSizePt";
-            this.numFontSizePt.Size = new System.Drawing.Size(254, 26);
-            this.numFontSizePt.TabIndex = 3;
             this.numFontSizePt.Value = new decimal(new int[] {
             2175,
             0,
@@ -264,63 +256,48 @@
             131072});
             this.numFontSizePt.ValueChanged += new System.EventHandler(this.numFontSizePt_ValueChanged);
             // 
+            // btnChooseFontFile
+            // 
+            resources.ApplyResources(this.btnChooseFontFile, "btnChooseFontFile");
+            this.btnChooseFontFile.Name = "btnChooseFontFile";
+            this.btnChooseFontFile.UseVisualStyleBackColor = true;
+            this.btnChooseFontFile.Click += new System.EventHandler(this.btnChooseFontFile_Click);
+            // 
             // btnSelectFont
             // 
-            this.btnSelectFont.Location = new System.Drawing.Point(6, 148);
+            resources.ApplyResources(this.btnSelectFont, "btnSelectFont");
             this.btnSelectFont.Name = "btnSelectFont";
-            this.btnSelectFont.Size = new System.Drawing.Size(254, 36);
-            this.btnSelectFont.TabIndex = 2;
-            this.btnSelectFont.Text = "选择字体";
             this.btnSelectFont.UseVisualStyleBackColor = true;
             this.btnSelectFont.Click += new System.EventHandler(this.btnSelectFont_Click);
             // 
             // lblFontSource
             // 
             this.lblFontSource.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblFontSource.Font = new System.Drawing.Font("宋体", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblFontSource.Location = new System.Drawing.Point(6, 49);
+            resources.ApplyResources(this.lblFontSource, "lblFontSource");
             this.lblFontSource.Name = "lblFontSource";
-            this.lblFontSource.Size = new System.Drawing.Size(254, 96);
-            this.lblFontSource.TabIndex = 1;
-            this.lblFontSource.Text = "宋体\r\n中国智造，惠及全球ABCabc123";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 187);
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(107, 20);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "字体大小 (Pt)：";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 24);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(79, 20);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "字体名称：";
             // 
             // btnDoGeneration
             // 
-            this.btnDoGeneration.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnDoGeneration.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnDoGeneration.Location = new System.Drawing.Point(0, 815);
+            resources.ApplyResources(this.btnDoGeneration, "btnDoGeneration");
             this.btnDoGeneration.Name = "btnDoGeneration";
-            this.btnDoGeneration.Size = new System.Drawing.Size(266, 45);
-            this.btnDoGeneration.TabIndex = 1;
-            this.btnDoGeneration.Text = "生成字体";
             this.btnDoGeneration.UseVisualStyleBackColor = true;
             this.btnDoGeneration.Click += new System.EventHandler(this.btnDoGeneration_Click);
             // 
             // fontDialog
             // 
-            this.fontDialog.AllowScriptChange = false;
             this.fontDialog.AllowVerticalFonts = false;
             this.fontDialog.MaxSize = 72;
             this.fontDialog.MinSize = 8;
-            this.fontDialog.ShowEffects = false;
             // 
             // debounceTimer
             // 
@@ -329,16 +306,10 @@
             // 
             // FrmMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(865, 876);
             this.Controls.Add(this.panel1);
-            this.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.MinimumSize = new System.Drawing.Size(629, 555);
             this.Name = "FrmMain";
-            this.Padding = new System.Windows.Forms.Padding(8);
-            this.Text = "字体文件转换 - 阅星曈工具箱";
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.panel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
@@ -379,6 +350,12 @@
         private System.Windows.Forms.FontDialog fontDialog;
         private System.Windows.Forms.Timer debounceTimer;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.CheckBox chkLandspace;
+        private System.Windows.Forms.CheckBox chkTraditionalChinese;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox chkVerticalFont;
+        private System.Windows.Forms.Button btnChooseFontFile;
     }
 }
 

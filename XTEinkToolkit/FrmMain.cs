@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XTEinkToolkit.Controls;
 using XTEinkTools;
 
 namespace XTEinkToolkit
 {
-    // TODO: 允许字体旋转
-    // TODO: 允许横屏预览
     // TODO: 允许加载TTF字体文件而无需安装
     public partial class FrmMain : Form
     {
+
+        private PrivateFontCollection privateFont;
+
         public FrmMain()
         {
             InitializeComponent();
@@ -29,26 +32,52 @@ namespace XTEinkToolkit
             }
         }
 
+        private static Size XTScreenSize = new Size(480, 800);
+
+        private static Size SwapDirection(Size s)
+        {
+            return new Size(s.Height, s.Width);
+        }
+
         private void FrmMain_Load(object sender, EventArgs e)
         {
             previewSurface.ScaleMode = XTEinkToolkit.Controls.CanvasControl.RenderScaleMode.PreferCenter;
             previewSurface.CanvasSize = new System.Drawing.Size(480, 800);
+            chkTraditionalChinese.Checked = FrmMainCodeString.boolShowTCPreview.Contains("true");
             DoPreview();
         }
 
         private void btnSelectFont_Click(object sender, EventArgs e)
         {
             fontDialog.Font = lblFontSource.Font;
+           
             if (fontDialog.ShowDialog(this) == DialogResult.OK)
             {
                 lblFontSource.Font = fontDialog.Font;
-                lblFontSource.Text = fontDialog.Font.Name + "\r\n中国智造，惠及全球ABCabc123";
+                lblFontSource.Text = fontDialog.Font.Name + "\r\n"+FrmMainCodeString.abcFontPreviewText;
                 numFontSizePt.ValueChanged -= numFontSizePt_ValueChanged;
                 numFontSizePt.Value = (decimal)fontDialog.Font.Size;
                 numFontSizePt.ValueChanged += numFontSizePt_ValueChanged;
 
             }
             DoPreview();
+        }
+
+
+        private void btnChooseFontFile_Click(object sender, EventArgs e)
+        {
+            if(DlgSelectCustomFont.ShowSelectDialog(this,out var pfc,out var fnt))
+            {
+                lblFontSource.Font = fnt;
+                privateFont?.Dispose();
+                privateFont = pfc;
+
+                lblFontSource.Text = fontDialog.Font.Name + "\r\n" + FrmMainCodeString.abcFontPreviewText;
+                numFontSizePt.ValueChanged -= numFontSizePt_ValueChanged;
+                numFontSizePt.Value = (decimal)lblFontSource.Font.Size;
+                numFontSizePt.ValueChanged += numFontSizePt_ValueChanged;
+                DoPreview();
+            }
         }
 
         private void btnPreview_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -99,55 +128,66 @@ namespace XTEinkToolkit
                 DoPreviewDirect();
             }
         }
-        string previewString = Properties.Resources.previewTexts;
+        string previewStringSC = Properties.Resources.previewTexts;
+        string previewStringTC = Properties.Resources.previewTestTC;
         void DoPreviewDirect()
         {
             debounceTimer.Enabled = false;
             btnPreview.Enabled = false;
-            btnPreview.Text = "渲染中...";
+            btnPreview.Text = FrmMainCodeString.abcRenderingPreview;
             Application.DoEvents();
             using (XTEinkFontRenderer renderer = new XTEinkFontRenderer())
             {
-                renderer.Font = lblFontSource.Font;
-                renderer.LineSpacingPx = (int)numLineSpacing.Value;
-                renderer.LightThrehold = numFontGamma.Value;
+                ConfigureRenderer(renderer);
+                Size fontRenderSize = renderer.GetFontRenderSize();
 
-                XTEinkFontRenderer.AntiAltasMode[] aaModesEnum = new XTEinkFontRenderer.AntiAltasMode[] {
+                var screenSize = XTScreenSize;
+                var rotatedScreenSize = chkLandspace.Checked ? SwapDirection(screenSize) : screenSize;
+
+                var previewSize = rotatedScreenSize;
+                if (chkVerticalFont.Checked)
+                {
+                    previewSize = SwapDirection(previewSize);
+                }
+
+                previewSurface.CanvasSize = previewSize; ;
+                XTEinkFontBinary fontBinary = new XTEinkFontBinary(fontRenderSize.Width, fontRenderSize.Height);
+                var g = previewSurface.GetGraphics();
+                g.ResetTransform();
+                if (chkVerticalFont.Checked) {
+                    g.TranslateTransform(previewSize.Width,0);
+                    g.RotateTransform(90);
+                }
+                Utility.RenderPreview(chkTraditionalChinese.Checked ? previewStringTC : previewStringSC, fontBinary, renderer, g, rotatedScreenSize);
+                previewSurface.Commit();
+            }
+            GC.Collect();
+            btnPreview.Enabled = true;
+            btnPreview.Text = FrmMainCodeString.abcBtnPreviewText;
+        }
+
+        private void ConfigureRenderer(XTEinkFontRenderer renderer)
+        {
+            renderer.Font = lblFontSource.Font;
+            renderer.LineSpacingPx = (int)numLineSpacing.Value;
+            renderer.LightThrehold = numFontGamma.Value;
+            renderer.IsVerticalFont = chkVerticalFont.Checked;
+            XTEinkFontRenderer.AntiAltasMode[] aaModesEnum = new XTEinkFontRenderer.AntiAltasMode[] {
                     XTEinkFontRenderer.AntiAltasMode.System1Bit, // 0x0
                     XTEinkFontRenderer.AntiAltasMode.System1BitGridFit, // 0x1
                     XTEinkFontRenderer.AntiAltasMode.SystemAntiAltas, // 0x2
                     XTEinkFontRenderer.AntiAltasMode.SystemAntiAltasGridFit //0x3
                 };
-                var whichAAMode = (chkRenderAntiAltas.Checked ? 2 : 0) + (chkRenderGridFit.Checked ? 1 : 0);
-                renderer.AAMode = aaModesEnum[whichAAMode];
-                Size fontRenderSize = renderer.GetFontRenderSize();
-
-                XTEinkFontBinary fontBinary = new XTEinkFontBinary(fontRenderSize.Width, fontRenderSize.Height);
-
-                Utility.RenderPreview(previewString, fontBinary, renderer, previewSurface.GetGraphics(), previewSurface.CanvasSize);
-                previewSurface.Commit();
-            }
-            GC.Collect();
-            btnPreview.Enabled = true;
-            btnPreview.Text = "查看预览";
+            var whichAAMode = (chkRenderAntiAltas.Checked ? 2 : 0) + (chkRenderGridFit.Checked ? 1 : 0);
+            renderer.AAMode = aaModesEnum[whichAAMode];
         }
 
         private string GetRenderTargetSize()
         {
             using (XTEinkFontRenderer renderer = new XTEinkFontRenderer())
             {
-                renderer.Font = lblFontSource.Font;
-                renderer.LineSpacingPx = (int)numLineSpacing.Value;
-                renderer.LightThrehold = numFontGamma.Value;
 
-                XTEinkFontRenderer.AntiAltasMode[] aaModesEnum = new XTEinkFontRenderer.AntiAltasMode[] {
-                    XTEinkFontRenderer.AntiAltasMode.System1Bit, // 0x0
-                    XTEinkFontRenderer.AntiAltasMode.System1BitGridFit, // 0x1
-                    XTEinkFontRenderer.AntiAltasMode.SystemAntiAltas, // 0x2
-                    XTEinkFontRenderer.AntiAltasMode.SystemAntiAltasGridFit //0x3
-                };
-                var whichAAMode = (chkRenderAntiAltas.Checked ? 2 : 0) + (chkRenderGridFit.Checked ? 1 : 0);
-                renderer.AAMode = aaModesEnum[whichAAMode];
+                ConfigureRenderer(renderer);
                 Size fontRenderSize = renderer.GetFontRenderSize();
                 return fontRenderSize.Width+"×"+fontRenderSize.Height;
             }
@@ -156,7 +196,7 @@ namespace XTEinkToolkit
         private void btnDoGeneration_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "BIN字体文件|*." + GetRenderTargetSize() + ".bin";
+            sfd.Filter = (FrmMainCodeString.abcSaveDialogTypeName.Trim())+"|*." + GetRenderTargetSize() + ".bin";
             if (sfd.ShowDialog() != DialogResult.OK)
             {
                 return;
@@ -165,24 +205,13 @@ namespace XTEinkToolkit
             btnDoGeneration.Enabled = false;
             EssentialDialogs.ProgressDialog.RunWork(this, (ps) =>
             {
-                ps.SetMessage("正在渲染字体...");
+                var renderingMsg = FrmMainCodeString.abcRenderingFont;
+                ps.SetMessage(renderingMsg);
                 using (XTEinkFontRenderer renderer = new XTEinkFontRenderer())
                 {
                     Invoke(new Action(() =>
                     {
-
-                        renderer.Font = lblFontSource.Font;
-                        renderer.LineSpacingPx = (int)numLineSpacing.Value;
-                        renderer.LightThrehold = numFontGamma.Value;
-
-                        XTEinkFontRenderer.AntiAltasMode[] aaModesEnum = new XTEinkFontRenderer.AntiAltasMode[] {
-                        XTEinkFontRenderer.AntiAltasMode.System1Bit, // 0x0
-                        XTEinkFontRenderer.AntiAltasMode.System1BitGridFit, // 0x1
-                        XTEinkFontRenderer.AntiAltasMode.SystemAntiAltas, // 0x2
-                        XTEinkFontRenderer.AntiAltasMode.SystemAntiAltasGridFit //0x3
-                    };
-                        var whichAAMode = (chkRenderAntiAltas.Checked ? 2 : 0) + (chkRenderGridFit.Checked ? 1 : 0);
-                        renderer.AAMode = aaModesEnum[whichAAMode];
+                        ConfigureRenderer(renderer);
                     }));
                     Size fontRenderSize = renderer.GetFontRenderSize();
 
@@ -193,7 +222,7 @@ namespace XTEinkToolkit
                         try
                         {
                             ps.SetProgress(i, maxCharRange);
-                            ps.SetMessage($"正在渲染字体...({i}/{maxCharRange})");
+                            ps.SetMessage($"{renderingMsg}({i}/{maxCharRange})");
                             renderer.RenderFont(i, fontBinary);
                         }
                         catch(Exception ex)
@@ -212,13 +241,15 @@ namespace XTEinkToolkit
                 btnDoGeneration.Enabled = true;
                 if (err != null)
                 {
-                    MessageBox.Show(this,"渲染字体时出错：\r\n" + err.GetType().FullName + ": " + err.Message, "渲染字体时发生错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(this, FrmMainCodeString.abcRenderingError+"：\r\n" + err.GetType().FullName + ": " + err.Message, FrmMainCodeString.abcRenderingError, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    MessageBox.Show(this,"字体文件导出成功！","到处完成",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    MessageBox.Show(this, FrmMainCodeString.abcSuccessDialogMsg, FrmMainCodeString.abcSuccessDialogTitle, MessageBoxButtons.OK,MessageBoxIcon.Information);
                 }
             });
         }
+
+
     }
 }

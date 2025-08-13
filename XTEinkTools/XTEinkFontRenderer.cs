@@ -26,6 +26,7 @@ namespace XTEinkTools
 
         public int LightThrehold { get; set; } = 128;
         public int LineSpacingPx { get; set; } = 0;
+        public bool IsVerticalFont { get; set; } = false;
         public Font Font { get; set; } = SystemFonts.DefaultFont;
 
         private Bitmap _tempRenderSurface;
@@ -42,8 +43,13 @@ namespace XTEinkTools
                 {
                     StringFormat strfmt = new StringFormat(StringFormat.GenericTypographic);
                     // strfmt.FormatFlags |= StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip;
-                    SizeF sf = g.MeasureString("永", this.Font,999,strfmt);
+                    SizeF sf = g.MeasureString("坐", this.Font,999,strfmt); 
+                    if (IsVerticalFont)
+                    {
+                        sf = new SizeF(sf.Height, sf.Width);
+                    }
                     Size s = new Size((int)Math.Round(sf.Width), (int)Math.Round(sf.Height) + this.LineSpacingPx);
+                    
                     return s;
                 }
             }
@@ -101,6 +107,10 @@ namespace XTEinkTools
                 {
                     this._tempGraphics.TextRenderingHint = targetHint;
                 }
+                if (IsVerticalFont)
+                {
+                    _format.FormatFlags |= StringFormatFlags.DirectionVertical;
+                }
             }
             
         }
@@ -111,6 +121,12 @@ namespace XTEinkTools
             syncSettings();
             char chr = (char)charCodePoint;
             this._tempGraphics.Clear(Color.Black);
+            if (IsVerticalFont)
+            {
+                this._tempGraphics.ResetTransform();
+                this._tempGraphics.TranslateTransform(0,renderer.Height);
+                this._tempGraphics.RotateTransform(-90);
+            }
             this._tempGraphics.DrawString(chr.ToString(), this.Font, Brushes.White, 0,0, _format);
             renderer.LoadFromBitmap(charCodePoint, _tempRenderSurface, 0, 0, this.LightThrehold);
         }

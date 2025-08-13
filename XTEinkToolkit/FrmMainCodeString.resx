@@ -117,11 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="previewTestTC" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\previewTestTC.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="abcBtnPreviewText" xml:space="preserve">
+    <value>查看预览</value>
   </data>
-  <data name="previewTexts" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\previewTexts.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="abcFontPreviewText" xml:space="preserve">
+    <value>中国智造，惠及全球ABCabc123</value>
+  </data>
+  <data name="abcOpenFontTypeName" xml:space="preserve">
+    <value>TrueType 字体文件</value>
+  </data>
+  <data name="abcOpenFontDialogTitle" xml:space="preserve">
+    <value>选择字体文件（可多选）</value>
+  </data>
+  <data name="abcOpenFontNoFamily" xml:space="preserve">
+    <value>选择的字体文件中不包含任何有效的字形。</value>
+  </data>
+  <data name="abcRenderingError" xml:space="preserve">
+    <value>渲染字体时发生错误</value>
+  </data>
+  <data name="abcRenderingFont" xml:space="preserve">
+    <value>正在渲染字体...</value>
+  </data>
+  <data name="abcRenderingPreview" xml:space="preserve">
+    <value>渲染中...</value>
+  </data>
+  <data name="abcSaveDialogTypeName" xml:space="preserve">
+    <value>BIN字体文件</value>
+  </data>
+  <data name="abcSuccessDialogMsg" xml:space="preserve">
+    <value>字体文件导出成功！</value>
+  </data>
+  <data name="abcSuccessDialogTitle" xml:space="preserve">
+    <value>导出完成</value>
+  </data>
+  <data name="boolShowTCPreview" xml:space="preserve">
+    <value>false</value>
   </data>
 </root>
