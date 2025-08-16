@@ -153,4 +153,129 @@
   <data name="boolShowTCPreview" xml:space="preserve">
     <value>false</value>
   </data>
+  <data name="dlgConfirmSelectSystemFont" xml:space="preserve">
+    <value>是否允许 字体文件转换 访问计算机上已安装的字体？
+• 本程序仅读取字体数据用于格式转换
+• 所有字体文件均来自您的本地设备
+• 请确认您拥有所选字体的合法使用权</value>
+  </data>
+  <data name="dlgConfirmSelectFontTitle" xml:space="preserve">
+    <value>访问字体文件</value>
+  </data>
+  <data name="dlgConfirmSelectFontNeverAsk" xml:space="preserve">
+    <value>始终允许</value>
+  </data>
+  <data name="dlgConfirmSelectFontFile" xml:space="preserve">
+    <value>是否允许 字体文件转换 访问计算机存储的字体文件？
+• 本程序仅读取字体数据用于格式转换
+• 所有字体文件均来自您的本地设备
+• 请确认您拥有所选字体的合法使用权</value>
+  </data>
+  <data name="dlgEULATitle" xml:space="preserve">
+    <value>软件许可协议</value>
+  </data>
+  <data name="dlgEULAContent" xml:space="preserve">
+    <value>
+　　　　　　　　字体转换工具最终用户许可协议
+
+软件许可
+
+本软件基于 MIT 开源许可证授权。这意味着您有权：
+- 自由复制、修改本软件的全部或部分代码
+- 二次开发及分发衍生版本
+- 用于个人或商业目的
+唯一要求：必须在所有副本中保留原始版权声明和许可声明。
+
+重要声明
+
+1. 功能说明  
+　　本程序仅为字体格式转换工具，可将设备上存储的字体文
+　　件转换为电纸书设备专用的 .bin 格式。不包含任何内
+　　置字体资源。
+
+2. 用户责任
+　　- 您必须确保输入字体文件已获得合法授权
+　　- 生成的字体制品版权归原始字体作者所有
+　　- 软件开发者不对转换结果承担版权责任
+
+3. 使用限制 
+　　禁止使用本工具：
+　　- 破解受版权保护的字体文件
+　　- 分发未获授权的字体制品
+　　- 用于侵犯知识产权的任何行为
+
+4. 免责条款
+　　本软件按"原样"提供，开发者不承担因使用本软件产生的
+　　任何直接或间接法律责任。
+
+
+MIT License
+
+Copyright (c) 2025 ZYFDroid
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</value>
+  </data>
+  <data name="dlgEULA2Title" xml:space="preserve">
+    <value>重要版权法律声明</value>
+  </data>
+  <data name="dlgEULA2Content" xml:space="preserve">
+    <value>
+* 请完整阅读本内容
+您即将生成的.bin格式字体文件受以下法律条款约束：
+
+I. 版权归属
+　1. 生成字体的所有著作权及相关知识产权均归属于原始字体权利方
+　2. 本程序仅为格式转换工具，不产生新的著作权
+
+II. 授权范围
+　生成文件仅限用于：
+　• 个人设备上的非商业性使用
+　• 学术研究与技术验证
+　• 已获权利方明示授权的场景
+
+III. 禁止行为
+　严格禁止：
+　1. 对生成文件进行网络传播或商业性分发
+　2. 将文件嵌入需授权许可的商用产品
+　3. 篡改、移除或遮挡原始版权标识
+
+IV. 用户法律责任
+　点击"确认"即表示：
+　1. 保证所使用的源字体已获得合法授权
+　2. 接受因违反本声明导致的一切法律后果
+　3. 承诺不侵犯任何第三方的知识产权</value>
+  </data>
+  <data name="abcPreviewParameters" xml:space="preserve">
+    <value>估测显示参数：
+单字大小 {3}×{4}
+{0} 行，每行 {1} 字符
+同屏最高 {2} 个中文字符
+预览样式和数据仅供参考，请以实机为准</value>
+  </data>
+  <data name="abcOK" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="abcCancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="abcAccept" xml:space="preserve">
+    <value>同意</value>
+  </data>
 </root>

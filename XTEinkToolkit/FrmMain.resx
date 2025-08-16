@@ -121,6 +121,10 @@
   <data name="btnPreview.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="btnPreview.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="btnPreview.Location" type="System.Drawing.Point, System.Drawing">
     <value>95, 0</value>
@@ -146,7 +150,6 @@
   <data name="&gt;&gt;btnPreview.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="previewSurface.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
@@ -166,7 +169,7 @@
     <value>previewSurface</value>
   </data>
   <data name="&gt;&gt;previewSurface.Type" xml:space="preserve">
-    <value>XTEinkToolkit.Controls.CanvasControl, XTEinkToolkit, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null</value>
+    <value>XTEinkToolkit.Controls.CanvasControl, XTEinkToolkit, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;previewSurface.Parent" xml:space="preserve">
     <value>groupBox1</value>
@@ -204,41 +207,53 @@
   <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="label7.AutoSize" type="System.Boolean, mscorlib">
+  <data name="lblPreviewMessage.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="label7.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+  <data name="lblPreviewMessage.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Bottom</value>
   </data>
-  <data name="label7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 776</value>
+  <data name="lblPreviewMessage.Font" type="System.Drawing.Font, System.Drawing">
+    <value>微软雅黑, 9pt</value>
   </data>
-  <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>219, 20</value>
+  <data name="lblPreviewMessage.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
-  <data name="label7.TabIndex" type="System.Int32, mscorlib">
+  <data name="lblPreviewMessage.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 773</value>
+  </data>
+  <data name="lblPreviewMessage.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 3, 3, 3</value>
+  </data>
+  <data name="lblPreviewMessage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>194, 23</value>
+  </data>
+  <data name="lblPreviewMessage.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
   </data>
-  <data name="label7.Text" xml:space="preserve">
+  <data name="lblPreviewMessage.Text" xml:space="preserve">
     <value>预览样式仅供参考，请以实机为准</value>
   </data>
-  <data name="&gt;&gt;label7.Name" xml:space="preserve">
-    <value>label7</value>
+  <data name="&gt;&gt;lblPreviewMessage.Name" xml:space="preserve">
+    <value>lblPreviewMessage</value>
   </data>
-  <data name="&gt;&gt;label7.Type" xml:space="preserve">
+  <data name="&gt;&gt;lblPreviewMessage.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;label7.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lblPreviewMessage.Parent" xml:space="preserve">
     <value>groupBox2</value>
   </data>
-  <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lblPreviewMessage.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="chkVerticalFont.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="chkVerticalFont.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="chkVerticalFont.Location" type="System.Drawing.Point, System.Drawing">
-    <value>177, 395</value>
+    <value>176, 452</value>
   </data>
   <data name="chkVerticalFont.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -270,8 +285,11 @@
   <data name="chkLandspace.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="chkLandspace.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="chkLandspace.Location" type="System.Drawing.Point, System.Drawing">
-    <value>93, 445</value>
+    <value>93, 502</value>
   </data>
   <data name="chkLandspace.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -300,8 +318,11 @@
   <data name="chkTraditionalChinese.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="chkTraditionalChinese.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="chkTraditionalChinese.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 445</value>
+    <value>10, 502</value>
   </data>
   <data name="chkTraditionalChinese.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -330,8 +351,11 @@
   <data name="chkRenderGridFit.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="chkRenderGridFit.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="chkRenderGridFit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>93, 395</value>
+    <value>93, 452</value>
   </data>
   <data name="chkRenderGridFit.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -361,8 +385,11 @@
   <data name="chkRenderAntiAltas.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="chkRenderAntiAltas.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="chkRenderAntiAltas.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 395</value>
+    <value>10, 452</value>
   </data>
   <data name="chkRenderAntiAltas.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -390,8 +417,41 @@
   <data name="&gt;&gt;chkRenderAntiAltas.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
+  <data name="label7.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label7.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label7.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 365</value>
+  </data>
+  <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
+    <value>135, 20</value>
+  </data>
+  <data name="label7.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="label7.Text" xml:space="preserve">
+    <value>字符间距（像素）：</value>
+  </data>
+  <data name="&gt;&gt;label7.Name" xml:space="preserve">
+    <value>label7</value>
+  </data>
+  <data name="&gt;&gt;label7.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label7.Parent" xml:space="preserve">
+    <value>groupBox2</value>
+  </data>
+  <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
   <data name="label6.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
+  </data>
+  <data name="label6.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="label6.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 312</value>
@@ -415,13 +475,16 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label6.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>7</value>
   </data>
   <data name="label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="label2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 422</value>
+    <value>6, 479</value>
   </data>
   <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
     <value>79, 20</value>
@@ -442,13 +505,16 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label2.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>8</value>
   </data>
   <data name="label5.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="label5.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="label5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 367</value>
+    <value>6, 424</value>
   </data>
   <data name="label5.Size" type="System.Drawing.Size, System.Drawing">
     <value>107, 20</value>
@@ -469,7 +535,10 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label5.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>9</value>
+  </data>
+  <data name="numFontGamma.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="numFontGamma.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 264</value>
@@ -490,10 +559,40 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numFontGamma.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>10</value>
+  </data>
+  <data name="numCharSpacing.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 389</value>
+  </data>
+  <data name="numCharSpacing.Size" type="System.Drawing.Size, System.Drawing">
+    <value>254, 26</value>
+  </data>
+  <data name="numCharSpacing.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="numCharSpacing.ToolTip" xml:space="preserve">
+    <value>字体的字符间距。
+由于阅星曈渲染文字时会向下取整，因此少量调整间距可能不会产生效果。
+此时需要调大更多的值才能生效。
+这个值也可以理解为字符间距至少为多少像素。</value>
+  </data>
+  <data name="&gt;&gt;numCharSpacing.Name" xml:space="preserve">
+    <value>numCharSpacing</value>
+  </data>
+  <data name="&gt;&gt;numCharSpacing.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;numCharSpacing.Parent" xml:space="preserve">
+    <value>groupBox2</value>
+  </data>
+  <data name="&gt;&gt;numCharSpacing.ZOrder" xml:space="preserve">
+    <value>11</value>
   </data>
   <data name="label4.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
+  </data>
+  <data name="label4.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="label4.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 241</value>
@@ -517,7 +616,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label4.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>12</value>
   </data>
   <data name="numLineSpacing.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 336</value>
@@ -544,7 +643,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numLineSpacing.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>13</value>
   </data>
   <data name="numFontSizePt.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 210</value>
@@ -565,7 +664,10 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numFontSizePt.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>14</value>
+  </data>
+  <data name="btnChooseFontFile.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="btnChooseFontFile.Location" type="System.Drawing.Point, System.Drawing">
     <value>136, 148</value>
@@ -589,7 +691,10 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;btnChooseFontFile.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>15</value>
+  </data>
+  <data name="btnSelectFont.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="btnSelectFont.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 148</value>
@@ -613,10 +718,13 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;btnSelectFont.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>16</value>
   </data>
   <data name="lblFontSource.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 21.75pt</value>
+  </data>
+  <data name="lblFontSource.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="lblFontSource.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 49</value>
@@ -626,10 +734,6 @@
   </data>
   <data name="lblFontSource.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
-  </data>
-  <data name="lblFontSource.Text" xml:space="preserve">
-    <value>宋体
-中国智造，惠及全球ABCabc123</value>
   </data>
   <data name="&gt;&gt;lblFontSource.Name" xml:space="preserve">
     <value>lblFontSource</value>
@@ -641,10 +745,13 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;lblFontSource.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>17</value>
   </data>
   <data name="label3.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
+  </data>
+  <data name="label3.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="label3.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 187</value>
@@ -668,10 +775,13 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label3.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>18</value>
   </data>
   <data name="label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
+  </data>
+  <data name="label1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 24</value>
@@ -695,7 +805,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>19</value>
   </data>
   <data name="groupBox2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -756,6 +866,9 @@
   </data>
   <data name="btnDoGeneration.Font" type="System.Drawing.Font, System.Drawing">
     <value>微软雅黑, 14.25pt, style=Bold</value>
+  </data>
+  <data name="btnDoGeneration.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="btnDoGeneration.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 807</value>
@@ -858,6 +971,9 @@
   </data>
   <data name="$this.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>8, 8, 8, 8</value>
+  </data>
+  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
+    <value>CenterScreen</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>字体文件转换 - 阅星曈工具箱</value>

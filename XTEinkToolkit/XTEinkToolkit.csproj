@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\AutoConfirmDialog.cs" />
     <Compile Include="Controls\CanvasControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

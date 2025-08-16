@@ -14,9 +14,6 @@ using XTEinkTools;
 
 namespace XTEinkToolkit
 {
-    // TODO: 试试看负数行间距？
-    // TODO: 试试看字符间距？
-    // TODO: 添加单屏渲染字数量，用于估算翻页加载事件。
     public partial class FrmMain : Form
     {
 
@@ -40,9 +37,15 @@ namespace XTEinkToolkit
         {
             return new Size(s.Height, s.Width);
         }
-
+        
         private void FrmMain_Load(object sender, EventArgs e)
         {
+            if (!EULADialog.ShowDialog(this, FrmMainCodeString.dlgEULAContent, FrmMainCodeString.dlgEULATitle, "eula_v1"))
+            {
+                Application.Exit();
+                return;
+            }
+
             previewSurface.ScaleMode = XTEinkToolkit.Controls.CanvasControl.RenderScaleMode.PreferCenter;
             previewSurface.CanvasSize = new System.Drawing.Size(480, 800);
             chkTraditionalChinese.Checked = FrmMainCodeString.boolShowTCPreview.Contains("true");
@@ -51,6 +54,11 @@ namespace XTEinkToolkit
 
         private void btnSelectFont_Click(object sender, EventArgs e)
         {
+            if(!AutoConfirmDialog.ShowDialog(this,FrmMainCodeString.dlgConfirmSelectSystemFont, FrmMainCodeString.dlgConfirmSelectFontTitle, FrmMainCodeString.dlgConfirmSelectFontNeverAsk, "flagAllowFontAccess"))
+            {
+                return;
+            }
+
             fontDialog.Font = lblFontSource.Font;
            
             if (fontDialog.ShowDialog(this) == DialogResult.OK)
@@ -68,13 +76,18 @@ namespace XTEinkToolkit
 
         private void btnChooseFontFile_Click(object sender, EventArgs e)
         {
-            if(DlgSelectCustomFont.ShowSelectDialog(this,out var pfc,out var fnt))
+            if (!AutoConfirmDialog.ShowDialog(this, FrmMainCodeString.dlgConfirmSelectFontFile, FrmMainCodeString.dlgConfirmSelectFontTitle, FrmMainCodeString.dlgConfirmSelectFontNeverAsk, "flagAllowFontFileAccess"))
+            {
+                return;
+            }
+            if (DlgSelectCustomFont.ShowSelectDialog(this,out var pfc,out var fnt))
             {
                 lblFontSource.Font = fnt;
                 privateFont?.Dispose();
                 privateFont = pfc;
-
-                lblFontSource.Text = fontDialog.Font.Name + "\r\n" + FrmMainCodeString.abcFontPreviewText;
+                
+                lblFontSource.Text = lblFontSource.Font.Name + "\r\n" + FrmMainCodeString.abcFontPreviewText; 
+                
                 numFontSizePt.ValueChanged -= numFontSizePt_ValueChanged;
                 numFontSizePt.Value = (decimal)lblFontSource.Font.Size;
                 numFontSizePt.ValueChanged += numFontSizePt_ValueChanged;
@@ -160,7 +173,8 @@ namespace XTEinkToolkit
                     g.TranslateTransform(previewSize.Width,0);
                     g.RotateTransform(90);
                 }
-                Utility.RenderPreview(chkTraditionalChinese.Checked ? previewStringTC : previewStringSC, fontBinary, renderer, g, rotatedScreenSize);
+                var size = Utility.RenderPreview(chkTraditionalChinese.Checked ? previewStringTC : previewStringSC, fontBinary, renderer, g, rotatedScreenSize);
+                lblPreviewMessage.Text = string.Format(FrmMainCodeString.abcPreviewParameters, size.Height, size.Width, size.Height * size.Width, fontRenderSize.Width, fontRenderSize.Height).Trim();
                 previewSurface.Commit();
             }
             GC.Collect();
@@ -181,6 +195,7 @@ namespace XTEinkToolkit
                     XTEinkFontRenderer.AntiAltasMode.SystemAntiAltasGridFit //0x3
                 };
             var whichAAMode = (chkRenderAntiAltas.Checked ? 2 : 0) + (chkRenderGridFit.Checked ? 1 : 0);
+            renderer.CharSpacingPx = (int)numCharSpacing.Value;
             renderer.AAMode = aaModesEnum[whichAAMode];
         }
 
@@ -197,6 +212,11 @@ namespace XTEinkToolkit
 
         private void btnDoGeneration_Click(object sender, EventArgs e)
         {
+            if (!EULADialog.ShowDialog(this, FrmMainCodeString.dlgEULA2Content, FrmMainCodeString.dlgEULA2Title, "fonteula_v1"))
+            {
+                return;
+            }
+
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = (FrmMainCodeString.abcSaveDialogTypeName.Trim())+"|*." + GetRenderTargetSize() + ".bin";
             if (sfd.ShowDialog() != DialogResult.OK)

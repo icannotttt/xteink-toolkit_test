@@ -26,6 +26,7 @@ namespace XTEinkTools
 
         public int LightThrehold { get; set; } = 128;
         public int LineSpacingPx { get; set; } = 0;
+        public int CharSpacingPx { get; set; } = 0;
         public bool IsVerticalFont { get; set; } = false;
         public Font Font { get; set; } = SystemFonts.DefaultFont;
 
@@ -44,12 +45,21 @@ namespace XTEinkTools
                     StringFormat strfmt = new StringFormat(StringFormat.GenericTypographic);
                     // strfmt.FormatFlags |= StringFormatFlags.FitBlackBox | StringFormatFlags.NoClip;
                     SizeF sf = g.MeasureString("坐", this.Font,999,strfmt); 
-                    if (IsVerticalFont)
+                    //if (IsVerticalFont)
+                    //{
+                    //    sf = new SizeF(sf.Height, sf.Width);
+                    //}
+                    Size s = new Size((int)Math.Round(sf.Width) + this.CharSpacingPx, (int)Math.Round(sf.Height) + this.LineSpacingPx);
+                    if(s.Height < 5)
                     {
-                        sf = new SizeF(sf.Height, sf.Width);
+                        s.Height = 5;
+                        LineSpacingPx = (int)(sf.Height - 5);
                     }
-                    Size s = new Size((int)Math.Round(sf.Width), (int)Math.Round(sf.Height) + this.LineSpacingPx);
-                    
+                    if (s.Width < 5)
+                    {
+                        s.Width = 5;
+                        CharSpacingPx = (int)(sf.Width - 5);
+                    }
                     return s;
                 }
             }
@@ -121,12 +131,40 @@ namespace XTEinkTools
             syncSettings();
             char chr = (char)charCodePoint;
             this._tempGraphics.Clear(Color.Black);
+            this._tempGraphics.ResetTransform();
             if (IsVerticalFont)
             {
-                this._tempGraphics.ResetTransform();
                 this._tempGraphics.TranslateTransform(0,renderer.Height);
                 this._tempGraphics.RotateTransform(-90);
             }
+
+            if(LineSpacingPx < 0)
+            {
+                if (IsVerticalFont)
+                {
+
+                    this._tempGraphics.TranslateTransform(LineSpacingPx / 2,0);
+                }
+                else
+                {
+
+                    this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
+                }
+            }
+            if (CharSpacingPx != 0)
+            {
+                if (IsVerticalFont)
+                {
+
+                    this._tempGraphics.TranslateTransform(0, CharSpacingPx / 2);
+                }
+                else
+                {
+
+                    this._tempGraphics.TranslateTransform(CharSpacingPx / 2,0);
+                }
+            }
+
             this._tempGraphics.DrawString(chr.ToString(), this.Font, Brushes.White, 0,0, _format);
             renderer.LoadFromBitmap(charCodePoint, _tempRenderSurface, 0, 0, this.LightThrehold);
         }

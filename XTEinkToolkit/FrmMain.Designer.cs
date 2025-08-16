@@ -37,16 +37,18 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
+            this.lblPreviewMessage = new System.Windows.Forms.Label();
             this.chkVerticalFont = new System.Windows.Forms.CheckBox();
             this.chkLandspace = new System.Windows.Forms.CheckBox();
             this.chkTraditionalChinese = new System.Windows.Forms.CheckBox();
             this.chkRenderGridFit = new System.Windows.Forms.CheckBox();
             this.chkRenderAntiAltas = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.numFontGamma = new System.Windows.Forms.TrackBar();
+            this.numCharSpacing = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.numLineSpacing = new System.Windows.Forms.NumericUpDown();
             this.numFontSizePt = new System.Windows.Forms.NumericUpDown();
@@ -65,6 +67,7 @@
             this.panel3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFontGamma)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numCharSpacing)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineSpacing)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFontSizePt)).BeginInit();
             this.SuspendLayout();
@@ -115,16 +118,18 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.label7);
+            this.groupBox2.Controls.Add(this.lblPreviewMessage);
             this.groupBox2.Controls.Add(this.chkVerticalFont);
             this.groupBox2.Controls.Add(this.chkLandspace);
             this.groupBox2.Controls.Add(this.chkTraditionalChinese);
             this.groupBox2.Controls.Add(this.chkRenderGridFit);
             this.groupBox2.Controls.Add(this.chkRenderAntiAltas);
+            this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.numFontGamma);
+            this.groupBox2.Controls.Add(this.numCharSpacing);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.numLineSpacing);
             this.groupBox2.Controls.Add(this.numFontSizePt);
@@ -137,10 +142,10 @@
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.TabStop = false;
             // 
-            // label7
+            // lblPreviewMessage
             // 
-            resources.ApplyResources(this.label7, "label7");
-            this.label7.Name = "label7";
+            resources.ApplyResources(this.lblPreviewMessage, "lblPreviewMessage");
+            this.lblPreviewMessage.Name = "lblPreviewMessage";
             // 
             // chkVerticalFont
             // 
@@ -186,6 +191,11 @@
             this.chkRenderAntiAltas.UseVisualStyleBackColor = true;
             this.chkRenderAntiAltas.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
+            // label7
+            // 
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
+            // 
             // label6
             // 
             resources.ApplyResources(this.label6, "label6");
@@ -212,6 +222,23 @@
             this.numFontGamma.Value = 127;
             this.numFontGamma.ValueChanged += new System.EventHandler(this.numFontGamma_ValueChanged);
             // 
+            // numCharSpacing
+            // 
+            resources.ApplyResources(this.numCharSpacing, "numCharSpacing");
+            this.numCharSpacing.Maximum = new decimal(new int[] {
+            120,
+            0,
+            0,
+            0});
+            this.numCharSpacing.Minimum = new decimal(new int[] {
+            32,
+            0,
+            0,
+            -2147483648});
+            this.numCharSpacing.Name = "numCharSpacing";
+            this.toolTip1.SetToolTip(this.numCharSpacing, resources.GetString("numCharSpacing.ToolTip"));
+            this.numCharSpacing.ValueChanged += new System.EventHandler(this.numLineSpacing_ValueChanged);
+            // 
             // label4
             // 
             resources.ApplyResources(this.label4, "label4");
@@ -225,6 +252,11 @@
             0,
             0,
             0});
+            this.numLineSpacing.Minimum = new decimal(new int[] {
+            32,
+            0,
+            0,
+            -2147483648});
             this.numLineSpacing.Name = "numLineSpacing";
             this.toolTip1.SetToolTip(this.numLineSpacing, resources.GetString("numLineSpacing.ToolTip"));
             this.numLineSpacing.ValueChanged += new System.EventHandler(this.numLineSpacing_ValueChanged);
@@ -319,6 +351,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFontGamma)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numCharSpacing)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineSpacing)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFontSizePt)).EndInit();
             this.ResumeLayout(false);
@@ -350,12 +383,14 @@
         private System.Windows.Forms.FontDialog fontDialog;
         private System.Windows.Forms.Timer debounceTimer;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label lblPreviewMessage;
         private System.Windows.Forms.CheckBox chkLandspace;
         private System.Windows.Forms.CheckBox chkTraditionalChinese;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkVerticalFont;
         private System.Windows.Forms.Button btnChooseFontFile;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown numCharSpacing;
     }
 }
 

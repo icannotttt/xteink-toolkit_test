@@ -61,6 +61,15 @@ namespace XTEinkToolkit {
         }
         
         /// <summary>
+        ///   查找类似 同意 的本地化字符串。
+        /// </summary>
+        internal static string abcAccept {
+            get {
+                return ResourceManager.GetString("abcAccept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 查看预览 的本地化字符串。
         /// </summary>
         internal static string abcBtnPreviewText {
@@ -70,11 +79,29 @@ namespace XTEinkToolkit {
         }
         
         /// <summary>
+        ///   查找类似 取消 的本地化字符串。
+        /// </summary>
+        internal static string abcCancel {
+            get {
+                return ResourceManager.GetString("abcCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 中国智造，惠及全球ABCabc123 的本地化字符串。
         /// </summary>
         internal static string abcFontPreviewText {
             get {
                 return ResourceManager.GetString("abcFontPreviewText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 确定 的本地化字符串。
+        /// </summary>
+        internal static string abcOK {
+            get {
+                return ResourceManager.GetString("abcOK", resourceCulture);
             }
         }
         
@@ -102,6 +129,19 @@ namespace XTEinkToolkit {
         internal static string abcOpenFontTypeName {
             get {
                 return ResourceManager.GetString("abcOpenFontTypeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 估测显示参数：
+        ///单字大小 {3}×{4}
+        ///{0} 行，每行 {1} 字符
+        ///同屏最高 {2} 个中文字符
+        ///预览样式和数据仅供参考，请以实机为准 的本地化字符串。
+        /// </summary>
+        internal static string abcPreviewParameters {
+            get {
+                return ResourceManager.GetString("abcPreviewParameters", resourceCulture);
             }
         }
         
@@ -165,6 +205,146 @@ namespace XTEinkToolkit {
         internal static string boolShowTCPreview {
             get {
                 return ResourceManager.GetString("boolShowTCPreview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 是否允许 字体文件转换 访问计算机存储的字体文件？
+        ///• 本程序仅读取字体数据用于格式转换
+        ///• 所有字体文件均来自您的本地设备
+        ///• 请确认您拥有所选字体的合法使用权 的本地化字符串。
+        /// </summary>
+        internal static string dlgConfirmSelectFontFile {
+            get {
+                return ResourceManager.GetString("dlgConfirmSelectFontFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 始终允许 的本地化字符串。
+        /// </summary>
+        internal static string dlgConfirmSelectFontNeverAsk {
+            get {
+                return ResourceManager.GetString("dlgConfirmSelectFontNeverAsk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 访问字体文件 的本地化字符串。
+        /// </summary>
+        internal static string dlgConfirmSelectFontTitle {
+            get {
+                return ResourceManager.GetString("dlgConfirmSelectFontTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 是否允许 字体文件转换 访问计算机上已安装的字体？
+        ///• 本程序仅读取字体数据用于格式转换
+        ///• 所有字体文件均来自您的本地设备
+        ///• 请确认您拥有所选字体的合法使用权 的本地化字符串。
+        /// </summary>
+        internal static string dlgConfirmSelectSystemFont {
+            get {
+                return ResourceManager.GetString("dlgConfirmSelectSystemFont", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 
+        ///* 请完整阅读本内容
+        ///您即将生成的.bin格式字体文件受以下法律条款约束：
+        ///
+        ///I. 版权归属
+        ///　1. 生成字体的所有著作权及相关知识产权均归属于原始字体权利方
+        ///　2. 本程序仅为格式转换工具，不产生新的著作权
+        ///
+        ///II. 授权范围
+        ///　生成文件仅限用于：
+        ///　• 个人设备上的非商业性使用
+        ///　• 学术研究与技术验证
+        ///　• 已获权利方明示授权的场景
+        ///
+        ///III. 禁止行为
+        ///　严格禁止：
+        ///　1. 对生成文件进行网络传播或商业性分发
+        ///　2. 将文件嵌入需授权许可的商用产品
+        ///　3. 篡改、移除或遮挡原始版权标识
+        ///
+        ///IV. 用户法律责任
+        ///　点击&quot;确认&quot;即表示：
+        ///　1. 保证所使用的源字体已获得合法授权
+        ///　2. 接受因违反本声明导致的一切法律后果
+        ///　3. 承诺不侵犯任何第三方的知识产权 的本地化字符串。
+        /// </summary>
+        internal static string dlgEULA2Content {
+            get {
+                return ResourceManager.GetString("dlgEULA2Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 重要版权法律声明 的本地化字符串。
+        /// </summary>
+        internal static string dlgEULA2Title {
+            get {
+                return ResourceManager.GetString("dlgEULA2Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 
+        ///　　　　　　　　字体转换工具最终用户许可协议
+        ///
+        ///软件许可
+        ///
+        ///本软件基于 MIT 开源许可证授权。这意味着您有权：
+        ///- 自由复制、修改本软件的全部或部分代码
+        ///- 二次开发及分发衍生版本
+        ///- 用于个人或商业目的
+        ///唯一要求：必须在所有副本中保留原始版权声明和许可声明。
+        ///
+        ///重要声明
+        ///
+        ///1. 功能说明  
+        ///　　本程序仅为字体格式转换工具，可将设备上存储的字体文
+        ///　　件转换为电纸书设备专用的 .bin 格式。不包含任何内
+        ///　　置字体资源。
+        ///
+        ///2. 用户责任
+        ///　　- 您必须确保输入字体文件已获得合法授权
+        ///　　- 生成的字体制品版权归原始字体作者所有
+        ///　　- 软件开发者不对转换结果承担版权责任
+        ///
+        ///3. 使用限制 
+        ///　　禁止使用本工具：
+        ///　　- 破解受版权保护的字体文件
+        ///　　- 分发未获授权的字体制品
+        ///　　- 用于侵犯知识产权的任何行为
+        ///
+        ///4. 免责条款
+        ///　　本软件按&quot;原样&quot;提供，开发者不承担因使用本软件产生的
+        ///　　任何直接或间接法律责任。
+        ///
+        ///
+        ///MIT License
+        ///
+        ///Copyright (c) 2025 ZYFDroid
+        ///
+        ///Permission  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string dlgEULAContent {
+            get {
+                return ResourceManager.GetString("dlgEULAContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 软件许可协议 的本地化字符串。
+        /// </summary>
+        internal static string dlgEULATitle {
+            get {
+                return ResourceManager.GetString("dlgEULATitle", resourceCulture);
             }
         }
     }

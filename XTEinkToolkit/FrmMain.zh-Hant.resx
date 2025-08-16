@@ -123,7 +123,7 @@
   <data name="groupBox1.Text" xml:space="preserve">
     <value>字體效果預覽</value>
   </data>
-  <data name="label7.Text" xml:space="preserve">
+  <data name="lblPreviewMessage.Text" xml:space="preserve">
     <value>預覽樣式僅供參考，請以實機爲準</value>
   </data>
   <data name="chkVerticalFont.Text" xml:space="preserve">
@@ -161,6 +161,9 @@
 當開啟此功能後，可以調整字體明度。
 </value>
   </data>
+  <data name="label7.Text" xml:space="preserve">
+    <value>字元間距（圖元）：</value>
+  </data>
   <data name="label6.Text" xml:space="preserve">
     <value>行間距（圖元）：</value>
   </data>
@@ -169,6 +172,12 @@
   </data>
   <data name="label5.Text" xml:space="preserve">
     <value>字體繪製方式：</value>
+  </data>
+  <data name="numCharSpacing.ToolTip" xml:space="preserve">
+    <value>字體的字元間距。
+由於閱星曈渲染文字時會向下取整，因此少量調整間距可能不會產生效果。
+此時需要調大更多的值才能生效。
+這個值也可以理解為字元間距至少為多少圖元。</value>
   </data>
   <data name="label4.Text" xml:space="preserve">
     <value>字體明度（粗細）：</value>

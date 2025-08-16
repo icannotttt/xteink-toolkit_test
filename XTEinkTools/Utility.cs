@@ -66,7 +66,7 @@ namespace XTEinkTools
         }
 
 
-        public static void RenderPreview(String texts,XTEinkFontBinary fontBinary,XTEinkFontRenderer renderer,Graphics target,Size screenSize)
+        public static Size RenderPreview(String texts,XTEinkFontBinary fontBinary,XTEinkFontRenderer renderer,Graphics target,Size screenSize)
         {
             /*
             嗯，用户给我整了个大活，要编写一个模拟阅星曈字体渲染的程序，让我一步步来看看怎样编写程序。
@@ -143,6 +143,8 @@ namespace XTEinkTools
             int currentChar = 0;
             string[] lines = texts.Split(new char[] {'\r','\n'},StringSplitOptions.RemoveEmptyEntries);
 
+            var returnVal = new Size(totalCharacter,totalLines);
+
             foreach (var oneLine in lines)
             {
                 bool hasNoMoreCharButSwitchedLine = false;
@@ -159,7 +161,7 @@ namespace XTEinkTools
                     }
                     if(currentLine >= totalLines)
                     {
-                        return;
+                        return returnVal;
                     }
                 }
                 if (!hasNoMoreCharButSwitchedLine)
@@ -170,11 +172,11 @@ namespace XTEinkTools
                 currentChar = 0;
                 if (currentLine >= totalLines)
                 {
-                    return;
+                    return returnVal;
                 }
             }
 
-
+            return returnVal;
         }
 
     }
