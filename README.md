@@ -12,6 +12,8 @@
 
 字体制作工具
 
+前往 [Release](https://gitee.com/ZYFDroid/xteink-toolkit/releases/latest) 下载最新版本
+
 ![Screenshot](readme_res/screenshot.png)
 
 
