@@ -151,7 +151,7 @@ namespace XTEinkTools
                     this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
                 }
             }
-            if (CharSpacingPx != 0)
+            if (CharSpacingPx != 0 && charCodePoint > 255)
             {
                 if (IsVerticalFont)
                 {

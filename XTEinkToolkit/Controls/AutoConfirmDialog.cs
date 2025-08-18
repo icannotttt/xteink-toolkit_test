@@ -254,27 +254,30 @@ namespace XTEinkToolkit.Controls
             }
         }
 
+        private static string GetFlagsDirectory()
+        {
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+            return Path.Combine(localAppData, assemblyName, "eula_flags");
+        }
+
+        private static string GetFlagFilePath(string autoConfirmFlagKey)
+        {
+            string flagsDirectory = GetFlagsDirectory();
+            return Path.Combine(flagsDirectory, $"{autoConfirmFlagKey}.ok");
+        }
+
+
         public static void ClearAllFlags()
         {
-            string flagsDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                Assembly.GetExecutingAssembly().GetName().Name,
-                "acflags");
-
+            string flagsDirectory = GetFlagsDirectory();
             if (Directory.Exists(flagsDirectory))
             {
                 Directory.Delete(flagsDirectory, true);
             }
         }
 
-        private static string GetFlagFilePath(string flagKey)
-        {
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                Assembly.GetExecutingAssembly().GetName().Name,
-                "acflags",
-                $"{flagKey}.ok");
-        }
+
     }
 
 
