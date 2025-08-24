@@ -133,6 +133,16 @@ namespace XTEinkToolkit {
         }
         
         /// <summary>
+        ///   查找类似 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.?!&apos;&quot;;:[]{}()&lt;&gt;!@#$%^&amp;*-=_+/\|
+        ///由于模拟排版算法限制，字体制作工具不支持英文排版效果。因此只能查看字符样式。以上是该字体中的英文字符。 的本地化字符串。
+        /// </summary>
+        internal static string abcPreviewEN {
+            get {
+                return ResourceManager.GetString("abcPreviewEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 估测显示参数：
         ///单字大小 {3}×{4}
         ///{0} 行，每行 {1} 字符

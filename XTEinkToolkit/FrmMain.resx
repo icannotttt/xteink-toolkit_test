@@ -207,6 +207,117 @@
   <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="chkShowENCharacter.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkShowENCharacter.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkShowENCharacter.Location" type="System.Drawing.Point, System.Drawing">
+    <value>170, -1</value>
+  </data>
+  <data name="chkShowENCharacter.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 24</value>
+  </data>
+  <data name="chkShowENCharacter.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="chkShowENCharacter.Text" xml:space="preserve">
+    <value>英文字符</value>
+  </data>
+  <data name="&gt;&gt;chkShowENCharacter.Name" xml:space="preserve">
+    <value>chkShowENCharacter</value>
+  </data>
+  <data name="&gt;&gt;chkShowENCharacter.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkShowENCharacter.Parent" xml:space="preserve">
+    <value>panel4</value>
+  </data>
+  <data name="&gt;&gt;chkShowENCharacter.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="radioButton1.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="radioButton1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="radioButton1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, -1</value>
+  </data>
+  <data name="radioButton1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 24</value>
+  </data>
+  <data name="radioButton1.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="radioButton1.Text" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="&gt;&gt;radioButton1.Name" xml:space="preserve">
+    <value>radioButton1</value>
+  </data>
+  <data name="&gt;&gt;radioButton1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;radioButton1.Parent" xml:space="preserve">
+    <value>panel4</value>
+  </data>
+  <data name="&gt;&gt;radioButton1.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="chkTraditionalChinese.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkTraditionalChinese.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkTraditionalChinese.Location" type="System.Drawing.Point, System.Drawing">
+    <value>87, -1</value>
+  </data>
+  <data name="chkTraditionalChinese.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 24</value>
+  </data>
+  <data name="chkTraditionalChinese.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="chkTraditionalChinese.Text" xml:space="preserve">
+    <value>繁体中文</value>
+  </data>
+  <data name="&gt;&gt;chkTraditionalChinese.Name" xml:space="preserve">
+    <value>chkTraditionalChinese</value>
+  </data>
+  <data name="&gt;&gt;chkTraditionalChinese.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkTraditionalChinese.Parent" xml:space="preserve">
+    <value>panel4</value>
+  </data>
+  <data name="&gt;&gt;chkTraditionalChinese.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="panel4.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 491</value>
+  </data>
+  <data name="panel4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>257, 30</value>
+  </data>
+  <data name="panel4.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;panel4.Name" xml:space="preserve">
+    <value>panel4</value>
+  </data>
+  <data name="&gt;&gt;panel4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panel4.Parent" xml:space="preserve">
+    <value>groupBox2</value>
+  </data>
+  <data name="&gt;&gt;panel4.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="lblPreviewMessage.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -244,7 +355,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;lblPreviewMessage.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="chkVerticalFont.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -253,7 +364,7 @@
     <value>NoControl</value>
   </data>
   <data name="chkVerticalFont.Location" type="System.Drawing.Point, System.Drawing">
-    <value>176, 452</value>
+    <value>176, 395</value>
   </data>
   <data name="chkVerticalFont.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -264,9 +375,9 @@
   <data name="chkVerticalFont.Text" xml:space="preserve">
     <value>竖版字体</value>
   </data>
-  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <data name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing">
     <value>285, 24</value>
-  </metadata>
+  </data>
   <data name="chkVerticalFont.ToolTip" xml:space="preserve">
     <value>将字体逆时针旋转90°，这样当横向显示时，将会呈现出从右往左，从上到下的竖版排版方式。</value>
   </data>
@@ -280,7 +391,40 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;chkVerticalFont.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
+  </data>
+  <data name="chkShowBorder.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="chkShowBorder.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="chkShowBorder.Location" type="System.Drawing.Point, System.Drawing">
+    <value>93, 445</value>
+  </data>
+  <data name="chkShowBorder.Size" type="System.Drawing.Size, System.Drawing">
+    <value>84, 24</value>
+  </data>
+  <data name="chkShowBorder.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="chkShowBorder.Text" xml:space="preserve">
+    <value>显示边距</value>
+  </data>
+  <data name="chkShowBorder.ToolTip" xml:space="preserve">
+    <value>显示字符边框，防止调整行间距和字符间距时意外切掉字符的一部分</value>
+  </data>
+  <data name="&gt;&gt;chkShowBorder.Name" xml:space="preserve">
+    <value>chkShowBorder</value>
+  </data>
+  <data name="&gt;&gt;chkShowBorder.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;chkShowBorder.Parent" xml:space="preserve">
+    <value>groupBox2</value>
+  </data>
+  <data name="&gt;&gt;chkShowBorder.ZOrder" xml:space="preserve">
+    <value>3</value>
   </data>
   <data name="chkLandspace.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -289,7 +433,7 @@
     <value>NoControl</value>
   </data>
   <data name="chkLandspace.Location" type="System.Drawing.Point, System.Drawing">
-    <value>93, 502</value>
+    <value>10, 445</value>
   </data>
   <data name="chkLandspace.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -313,40 +457,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;chkLandspace.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="chkTraditionalChinese.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="chkTraditionalChinese.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="chkTraditionalChinese.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 502</value>
-  </data>
-  <data name="chkTraditionalChinese.Size" type="System.Drawing.Size, System.Drawing">
-    <value>84, 24</value>
-  </data>
-  <data name="chkTraditionalChinese.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="chkTraditionalChinese.Text" xml:space="preserve">
-    <value>繁体中文</value>
-  </data>
-  <data name="chkTraditionalChinese.ToolTip" xml:space="preserve">
-    <value>查看繁中版本的预览文本段落</value>
-  </data>
-  <data name="&gt;&gt;chkTraditionalChinese.Name" xml:space="preserve">
-    <value>chkTraditionalChinese</value>
-  </data>
-  <data name="&gt;&gt;chkTraditionalChinese.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;chkTraditionalChinese.Parent" xml:space="preserve">
-    <value>groupBox2</value>
-  </data>
-  <data name="&gt;&gt;chkTraditionalChinese.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="chkRenderGridFit.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -355,7 +466,7 @@
     <value>NoControl</value>
   </data>
   <data name="chkRenderGridFit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>93, 452</value>
+    <value>93, 395</value>
   </data>
   <data name="chkRenderGridFit.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -380,7 +491,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;chkRenderGridFit.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="chkRenderAntiAltas.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -389,7 +500,7 @@
     <value>NoControl</value>
   </data>
   <data name="chkRenderAntiAltas.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 452</value>
+    <value>10, 395</value>
   </data>
   <data name="chkRenderAntiAltas.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 24</value>
@@ -415,7 +526,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;chkRenderAntiAltas.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <data name="label7.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -424,7 +535,7 @@
     <value>NoControl</value>
   </data>
   <data name="label7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 365</value>
+    <value>125, 313</value>
   </data>
   <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
     <value>135, 20</value>
@@ -445,7 +556,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>7</value>
   </data>
   <data name="label6.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -475,7 +586,37 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label6.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>8</value>
+  </data>
+  <data name="label8.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label8.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 469</value>
+  </data>
+  <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
+    <value>79, 20</value>
+  </data>
+  <data name="label8.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>文本段落：</value>
+  </data>
+  <data name="&gt;&gt;label8.Name" xml:space="preserve">
+    <value>label8</value>
+  </data>
+  <data name="&gt;&gt;label8.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label8.Parent" xml:space="preserve">
+    <value>groupBox2</value>
+  </data>
+  <data name="&gt;&gt;label8.ZOrder" xml:space="preserve">
+    <value>9</value>
   </data>
   <data name="label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -484,7 +625,7 @@
     <value>NoControl</value>
   </data>
   <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 479</value>
+    <value>6, 422</value>
   </data>
   <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
     <value>79, 20</value>
@@ -505,7 +646,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label2.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>10</value>
   </data>
   <data name="label5.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -514,7 +655,7 @@
     <value>NoControl</value>
   </data>
   <data name="label5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 424</value>
+    <value>6, 367</value>
   </data>
   <data name="label5.Size" type="System.Drawing.Size, System.Drawing">
     <value>107, 20</value>
@@ -535,7 +676,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label5.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>11</value>
   </data>
   <data name="numFontGamma.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -559,13 +700,13 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numFontGamma.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>12</value>
   </data>
   <data name="numCharSpacing.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 389</value>
+    <value>129, 336</value>
   </data>
   <data name="numCharSpacing.Size" type="System.Drawing.Size, System.Drawing">
-    <value>254, 26</value>
+    <value>131, 26</value>
   </data>
   <data name="numCharSpacing.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -586,7 +727,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numCharSpacing.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>13</value>
   </data>
   <data name="label4.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -616,13 +757,13 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label4.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>14</value>
   </data>
   <data name="numLineSpacing.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 336</value>
   </data>
   <data name="numLineSpacing.Size" type="System.Drawing.Size, System.Drawing">
-    <value>254, 26</value>
+    <value>121, 26</value>
   </data>
   <data name="numLineSpacing.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -643,7 +784,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numLineSpacing.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>15</value>
   </data>
   <data name="numFontSizePt.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 210</value>
@@ -664,7 +805,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;numFontSizePt.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>16</value>
   </data>
   <data name="btnChooseFontFile.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -691,7 +832,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;btnChooseFontFile.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>17</value>
   </data>
   <data name="btnSelectFont.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -718,7 +859,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;btnSelectFont.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>18</value>
   </data>
   <data name="lblFontSource.Font" type="System.Drawing.Font, System.Drawing">
     <value>宋体, 21.75pt</value>
@@ -745,7 +886,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;lblFontSource.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>19</value>
   </data>
   <data name="label3.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -775,7 +916,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label3.ZOrder" xml:space="preserve">
-    <value>18</value>
+    <value>20</value>
   </data>
   <data name="label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -805,7 +946,7 @@
     <value>groupBox2</value>
   </data>
   <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
-    <value>19</value>
+    <value>21</value>
   </data>
   <data name="groupBox2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -945,15 +1086,15 @@
   <data name="&gt;&gt;panel1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="fontDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <data name="fontDialog.TrayLocation" type="System.Drawing.Point, System.Drawing">
     <value>23, 24</value>
-  </metadata>
-  <metadata name="debounceTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  </data>
+  <data name="debounceTimer.TrayLocation" type="System.Drawing.Point, System.Drawing">
     <value>139, 24</value>
-  </metadata>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  </data>
+  <data name="$this.Localizable" type="System.Boolean, mscorlib">
     <value>True</value>
-  </metadata>
+  </data>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>8, 20</value>
   </data>
@@ -1001,5 +1142,74 @@
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
     <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="label3.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="label5.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="label1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="panel3.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="label4.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="numFontGamma.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="$this.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="groupBox1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btnSelectFont.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btnDoGeneration.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="numFontSizePt.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="lblFontSource.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="previewSurface.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="panel2.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btnPreview.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="label7.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="label2.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="panel1.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="label6.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="groupBox2.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="btnChooseFontFile.ToolTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="abcRendering" xml:space="preserve">
+    <value />
+  </data>
+  <data name="chkTraditionalChinese.ToolTip" xml:space="preserve">
+    <value>显示繁体中文的预览段落</value>
   </data>
 </root>

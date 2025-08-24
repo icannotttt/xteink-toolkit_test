@@ -37,14 +37,18 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.chkShowENCharacter = new System.Windows.Forms.RadioButton();
+            this.chkTraditionalChinese = new System.Windows.Forms.RadioButton();
             this.lblPreviewMessage = new System.Windows.Forms.Label();
             this.chkVerticalFont = new System.Windows.Forms.CheckBox();
+            this.chkShowBorder = new System.Windows.Forms.CheckBox();
             this.chkLandspace = new System.Windows.Forms.CheckBox();
-            this.chkTraditionalChinese = new System.Windows.Forms.CheckBox();
             this.chkRenderGridFit = new System.Windows.Forms.CheckBox();
             this.chkRenderAntiAltas = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.numFontGamma = new System.Windows.Forms.TrackBar();
@@ -61,11 +65,13 @@
             this.fontDialog = new System.Windows.Forms.FontDialog();
             this.debounceTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFontGamma)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numCharSpacing)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineSpacing)).BeginInit();
@@ -118,14 +124,16 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.panel4);
             this.groupBox2.Controls.Add(this.lblPreviewMessage);
             this.groupBox2.Controls.Add(this.chkVerticalFont);
+            this.groupBox2.Controls.Add(this.chkShowBorder);
             this.groupBox2.Controls.Add(this.chkLandspace);
-            this.groupBox2.Controls.Add(this.chkTraditionalChinese);
             this.groupBox2.Controls.Add(this.chkRenderGridFit);
             this.groupBox2.Controls.Add(this.chkRenderAntiAltas);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.numFontGamma);
@@ -142,6 +150,28 @@
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.TabStop = false;
             // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.chkShowENCharacter);
+            this.panel4.Controls.Add(this.radioButton1);
+            this.panel4.Controls.Add(this.chkTraditionalChinese);
+            resources.ApplyResources(this.panel4, "panel4");
+            this.panel4.Name = "panel4";
+            // 
+            // chkShowENCharacter
+            // 
+            resources.ApplyResources(this.chkShowENCharacter, "chkShowENCharacter");
+            this.chkShowENCharacter.Name = "chkShowENCharacter";
+            this.chkShowENCharacter.UseVisualStyleBackColor = true;
+            this.chkShowENCharacter.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
+            // chkTraditionalChinese
+            // 
+            resources.ApplyResources(this.chkTraditionalChinese, "chkTraditionalChinese");
+            this.chkTraditionalChinese.Name = "chkTraditionalChinese";
+            this.chkTraditionalChinese.UseVisualStyleBackColor = true;
+            this.chkTraditionalChinese.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
             // lblPreviewMessage
             // 
             resources.ApplyResources(this.lblPreviewMessage, "lblPreviewMessage");
@@ -155,6 +185,14 @@
             this.chkVerticalFont.UseVisualStyleBackColor = true;
             this.chkVerticalFont.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
+            // chkShowBorder
+            // 
+            resources.ApplyResources(this.chkShowBorder, "chkShowBorder");
+            this.chkShowBorder.Name = "chkShowBorder";
+            this.toolTip1.SetToolTip(this.chkShowBorder, resources.GetString("chkShowBorder.ToolTip"));
+            this.chkShowBorder.UseVisualStyleBackColor = true;
+            this.chkShowBorder.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
             // chkLandspace
             // 
             resources.ApplyResources(this.chkLandspace, "chkLandspace");
@@ -162,14 +200,6 @@
             this.toolTip1.SetToolTip(this.chkLandspace, resources.GetString("chkLandspace.ToolTip"));
             this.chkLandspace.UseVisualStyleBackColor = true;
             this.chkLandspace.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
-            // 
-            // chkTraditionalChinese
-            // 
-            resources.ApplyResources(this.chkTraditionalChinese, "chkTraditionalChinese");
-            this.chkTraditionalChinese.Name = "chkTraditionalChinese";
-            this.toolTip1.SetToolTip(this.chkTraditionalChinese, resources.GetString("chkTraditionalChinese.ToolTip"));
-            this.chkTraditionalChinese.UseVisualStyleBackColor = true;
-            this.chkTraditionalChinese.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
             // chkRenderGridFit
             // 
@@ -200,6 +230,11 @@
             // 
             resources.ApplyResources(this.label6, "label6");
             this.label6.Name = "label6";
+            // 
+            // label8
+            // 
+            resources.ApplyResources(this.label8, "label8");
+            this.label8.Name = "label8";
             // 
             // label2
             // 
@@ -336,6 +371,15 @@
             this.debounceTimer.Interval = 1;
             this.debounceTimer.Tick += new System.EventHandler(this.debounceTimer_Tick);
             // 
+            // radioButton1
+            // 
+            resources.ApplyResources(this.radioButton1, "radioButton1");
+            this.radioButton1.Checked = true;
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.TabStop = true;
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
             // FrmMain
             // 
             resources.ApplyResources(this, "$this");
@@ -350,6 +394,8 @@
             this.panel3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFontGamma)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numCharSpacing)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineSpacing)).EndInit();
@@ -385,12 +431,17 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Label lblPreviewMessage;
         private System.Windows.Forms.CheckBox chkLandspace;
-        private System.Windows.Forms.CheckBox chkTraditionalChinese;
+        private System.Windows.Forms.RadioButton chkTraditionalChinese;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkVerticalFont;
         private System.Windows.Forms.Button btnChooseFontFile;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown numCharSpacing;
+        private System.Windows.Forms.RadioButton chkShowENCharacter;
+        private System.Windows.Forms.CheckBox chkShowBorder;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.RadioButton radioButton1;
     }
 }
 

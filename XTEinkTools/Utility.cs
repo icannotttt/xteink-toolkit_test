@@ -48,7 +48,7 @@ namespace XTEinkTools
         }
 
 
-        public static void RenderToCanvas(this XTEinkFontBinary font, int charCode,Graphics dest,int sx,int sy)
+        public static void RenderToCanvas(this XTEinkFontBinary font, int charCode, Graphics dest, int sx, int sy, bool showBorder = false)
         {
             for (int y = 0; y < font.Height; y++)
             {
@@ -62,11 +62,11 @@ namespace XTEinkTools
                     }
                 }
             }
-            // dest.DrawRectangle(Pens.Green,sx,sy,font.Width-1,font.Height-1);
+            if (showBorder) { dest.DrawRectangle(Pens.Green, sx, sy, font.Width - 1, font.Height - 1); }
         }
 
 
-        public static Size RenderPreview(String texts,XTEinkFontBinary fontBinary,XTEinkFontRenderer renderer,Graphics target,Size screenSize)
+        public static Size RenderPreview(String texts,XTEinkFontBinary fontBinary,XTEinkFontRenderer renderer,Graphics target,Size screenSize,bool showBorder)
         {
             /*
             嗯，用户给我整了个大活，要编写一个模拟阅星曈字体渲染的程序，让我一步步来看看怎样编写程序。
@@ -136,7 +136,7 @@ namespace XTEinkTools
             {
                 var pt = getCharacterPosition(cx,cy);
                 renderer.RenderFont((int)chr, fontBinary);
-                fontBinary.RenderToCanvas((int)chr,target,pt.X + screenPaddingLeft,pt.Y + screenPaddingTop);
+                fontBinary.RenderToCanvas((int)chr,target,pt.X + screenPaddingLeft,pt.Y + screenPaddingTop,showBorder);
             }
 
             int currentLine = 0;

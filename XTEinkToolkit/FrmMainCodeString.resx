@@ -278,4 +278,8 @@ IV. 用户法律责任
   <data name="abcAccept" xml:space="preserve">
     <value>同意</value>
   </data>
+  <data name="abcPreviewEN" xml:space="preserve">
+    <value>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.?!'";:[]{}()&lt;&gt;!@#$%^&amp;*-=_+/\|
+由于模拟排版算法限制，字体制作工具不支持英文排版效果。因此只能查看字符样式。以上是该字体中的英文字符。</value>
+  </data>
 </root>

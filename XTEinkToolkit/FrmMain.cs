@@ -14,6 +14,12 @@ using XTEinkTools;
 
 namespace XTEinkToolkit
 {
+    // TODO: 渲染选项也添加渲染字体边框功能，这个边框将会显示在阅星曈上
+    // TODO: 根据选择的字体名称，自动生成合适的文件名
+    // TODO: 检查用户输入的文件名是否包含不应该出现的宽高信息
+    // TODO: 当程序放在阅星曈SD卡所在文件夹时，则不会弹出传统对话框，而是出现一个简单的文件名对话框。文件将会直接存储在Fonts目录下
+    // TODO: 当程序检测到插入的可移除存储设备，且是阅星曈的存储卡时，同上
+
     public partial class FrmMain : Form
     {
 
@@ -173,7 +179,12 @@ namespace XTEinkToolkit
                     g.TranslateTransform(previewSize.Width,0);
                     g.RotateTransform(90);
                 }
-                var size = Utility.RenderPreview(chkTraditionalChinese.Checked ? previewStringTC : previewStringSC, fontBinary, renderer, g, rotatedScreenSize);
+
+                string previewString = chkTraditionalChinese.Checked ? previewStringTC : previewStringSC;
+                if (chkShowENCharacter.Checked) {
+                    previewString = FrmMainCodeString.abcPreviewEN;
+                }
+                var size = Utility.RenderPreview(previewString, fontBinary, renderer, g, rotatedScreenSize,chkShowBorder.Checked);
                 lblPreviewMessage.Text = string.Format(FrmMainCodeString.abcPreviewParameters, size.Height, size.Width, size.Height * size.Width, fontRenderSize.Width, fontRenderSize.Height).Trim();
                 previewSurface.Commit();
             }

@@ -19,7 +19,7 @@ namespace XTEinkToolkit
         [STAThread]
         static void Main()
         {
-            // TestZhHant();
+            //TestZhHant();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FrmMain());

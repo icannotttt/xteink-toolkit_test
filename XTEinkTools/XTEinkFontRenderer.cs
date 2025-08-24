@@ -138,18 +138,15 @@ namespace XTEinkTools
                 this._tempGraphics.RotateTransform(-90);
             }
 
-            if(LineSpacingPx < 0)
+            if (IsVerticalFont)
             {
-                if (IsVerticalFont)
-                {
 
                     this._tempGraphics.TranslateTransform(LineSpacingPx / 2,0);
-                }
-                else
-                {
+            }
+            else
+            {
 
-                    this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
-                }
+                this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
             }
             if (CharSpacingPx != 0 && charCodePoint > 255)
             {
