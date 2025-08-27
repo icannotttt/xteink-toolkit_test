@@ -7,6 +7,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using XTEinkToolkit.Controls;
@@ -14,11 +15,6 @@ using XTEinkTools;
 
 namespace XTEinkToolkit
 {
-    // TODO: 渲染选项也添加渲染字体边框功能，这个边框将会显示在阅星曈上
-    // TODO: 根据选择的字体名称，自动生成合适的文件名
-    // TODO: 检查用户输入的文件名是否包含不应该出现的宽高信息
-    // TODO: 当程序放在阅星曈SD卡所在文件夹时，则不会弹出传统对话框，而是出现一个简单的文件名对话框。文件将会直接存储在Fonts目录下
-    // TODO: 当程序检测到插入的可移除存储设备，且是阅星曈的存储卡时，同上
 
     public partial class FrmMain : Form
     {
@@ -32,10 +28,13 @@ namespace XTEinkToolkit
             {
                 this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             }
-            catch {
+            catch
+            {
                 this.Icon = SystemIcons.Application;
             }
         }
+
+        bool fontSelected = false;
 
         private static Size XTScreenSize = new Size(480, 800);
 
@@ -43,7 +42,7 @@ namespace XTEinkToolkit
         {
             return new Size(s.Height, s.Width);
         }
-        
+
         private void FrmMain_Load(object sender, EventArgs e)
         {
             if (!EULADialog.ShowDialog(this, FrmMainCodeString.dlgEULAContent, FrmMainCodeString.dlgEULATitle, "eula_v1"))
@@ -60,21 +59,21 @@ namespace XTEinkToolkit
 
         private void btnSelectFont_Click(object sender, EventArgs e)
         {
-            if(!AutoConfirmDialog.ShowDialog(this,FrmMainCodeString.dlgConfirmSelectSystemFont, FrmMainCodeString.dlgConfirmSelectFontTitle, FrmMainCodeString.dlgConfirmSelectFontNeverAsk, "flagAllowFontAccess"))
+            if (!AutoConfirmDialog.ShowDialog(this, FrmMainCodeString.dlgConfirmSelectSystemFont, FrmMainCodeString.dlgConfirmSelectFontTitle, FrmMainCodeString.dlgConfirmSelectFontNeverAsk, "flagAllowFontAccess"))
             {
                 return;
             }
 
             fontDialog.Font = lblFontSource.Font;
-           
+
             if (fontDialog.ShowDialog(this) == DialogResult.OK)
             {
                 lblFontSource.Font = fontDialog.Font;
-                lblFontSource.Text = fontDialog.Font.Name + "\r\n"+FrmMainCodeString.abcFontPreviewText;
+                lblFontSource.Text = fontDialog.Font.Name + "\r\n" + FrmMainCodeString.abcFontPreviewText;
                 numFontSizePt.ValueChanged -= numFontSizePt_ValueChanged;
                 numFontSizePt.Value = (decimal)fontDialog.Font.Size;
                 numFontSizePt.ValueChanged += numFontSizePt_ValueChanged;
-
+                btnDoGeneration.Enabled = true;
             }
             DoPreview();
         }
@@ -86,17 +85,18 @@ namespace XTEinkToolkit
             {
                 return;
             }
-            if (DlgSelectCustomFont.ShowSelectDialog(this,out var pfc,out var fnt))
+            if (DlgSelectCustomFont.ShowSelectDialog(this, out var pfc, out var fnt))
             {
                 lblFontSource.Font = fnt;
                 privateFont?.Dispose();
                 privateFont = pfc;
-                
-                lblFontSource.Text = lblFontSource.Font.Name + "\r\n" + FrmMainCodeString.abcFontPreviewText; 
-                
+
+                lblFontSource.Text = lblFontSource.Font.Name + "\r\n" + FrmMainCodeString.abcFontPreviewText;
+
                 numFontSizePt.ValueChanged -= numFontSizePt_ValueChanged;
                 numFontSizePt.Value = (decimal)lblFontSource.Font.Size;
                 numFontSizePt.ValueChanged += numFontSizePt_ValueChanged;
+                btnDoGeneration.Enabled = true;
                 DoPreview();
             }
         }
@@ -175,16 +175,18 @@ namespace XTEinkToolkit
                 XTEinkFontBinary fontBinary = new XTEinkFontBinary(fontRenderSize.Width, fontRenderSize.Height);
                 var g = previewSurface.GetGraphics();
                 g.ResetTransform();
-                if (chkVerticalFont.Checked) {
-                    g.TranslateTransform(previewSize.Width,0);
+                if (chkVerticalFont.Checked)
+                {
+                    g.TranslateTransform(previewSize.Width, 0);
                     g.RotateTransform(90);
                 }
 
                 string previewString = chkTraditionalChinese.Checked ? previewStringTC : previewStringSC;
-                if (chkShowENCharacter.Checked) {
+                if (chkShowENCharacter.Checked)
+                {
                     previewString = FrmMainCodeString.abcPreviewEN;
                 }
-                var size = Utility.RenderPreview(previewString, fontBinary, renderer, g, rotatedScreenSize,chkShowBorder.Checked);
+                var size = Utility.RenderPreview(previewString, fontBinary, renderer, g, rotatedScreenSize, chkShowBorder.Checked);
                 lblPreviewMessage.Text = string.Format(FrmMainCodeString.abcPreviewParameters, size.Height, size.Width, size.Height * size.Width, fontRenderSize.Width, fontRenderSize.Height).Trim();
                 previewSurface.Commit();
             }
@@ -217,9 +219,83 @@ namespace XTEinkToolkit
 
                 ConfigureRenderer(renderer);
                 Size fontRenderSize = renderer.GetFontRenderSize();
-                return fontRenderSize.Width+"×"+fontRenderSize.Height;
+                return fontRenderSize.Width + "×" + fontRenderSize.Height;
             }
         }
+
+
+
+        /// <summary>
+        /// 检查文件名中是否包含多个宽高信息
+        /// </summary>
+        /// <param name="fileName">文件名</param>
+        /// <returns>如果包含多个宽高信息则返回true，否则返回false</returns>
+        private bool ContainsMultipleSizeInfo(string fileName)
+        {
+            // 使用正则表达式匹配宽高信息模式（数字×数字）
+            var matches = System.Text.RegularExpressions.Regex.Matches(fileName, @"\d+×\d+");
+            return matches.Count > 1;
+        }
+
+        /// <summary>
+        /// 从文件名中提取宽高信息
+        /// </summary>
+        /// <param name="fileName">文件名</param>
+        /// <returns>提取到的宽高信息列表</returns>
+        private System.Collections.Generic.List<string> ExtractAllSizeInfo(string fileName)
+        {
+            var matches = System.Text.RegularExpressions.Regex.Matches(fileName, @"\d+×\d+");
+            var result = new System.Collections.Generic.List<string>();
+            foreach (System.Text.RegularExpressions.Match match in matches)
+            {
+                result.Add(match.Value);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 检查程序是否运行在阅星曈SD卡目录下或者已经插入阅星曈的SD卡
+        /// </summary>
+        /// <returns>如果是则返回字体文件夹路径，否则返回null</returns>
+        private string GetXTSDCardPath()
+        {
+            try
+            {
+                string appPath = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
+                string rootPath = System.IO.Path.GetPathRoot(appPath);
+
+                // 检查程序所在驱动器是否存在XTCache文件夹
+                string xtCachePath = System.IO.Path.Combine(rootPath, "XTCache");
+                if (System.IO.Directory.Exists(xtCachePath))
+                {
+                    var fontPath = Path.Combine(rootPath, "Fonts");
+
+                    return fontPath;
+                }
+
+                // 检查可移动磁盘根目录是否存在XTCache文件夹
+                foreach (var drive in System.IO.DriveInfo.GetDrives())
+                {
+                    if (drive.DriveType == System.IO.DriveType.Removable && drive.IsReady)
+                    {
+                        xtCachePath = System.IO.Path.Combine(drive.Name, "XTCache");
+                        if (System.IO.Directory.Exists(xtCachePath))
+                        {
+                            var fontPath = Path.Combine(drive.Name, "Fonts");
+
+                            return fontPath;
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
 
         private void btnDoGeneration_Click(object sender, EventArgs e)
         {
@@ -229,10 +305,73 @@ namespace XTEinkToolkit
             }
 
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = (FrmMainCodeString.abcSaveDialogTypeName.Trim())+"|*." + GetRenderTargetSize() + ".bin";
-            if (sfd.ShowDialog() != DialogResult.OK)
+            sfd.Filter = (FrmMainCodeString.abcSaveDialogTypeName.Trim()) + "|*." + GetRenderTargetSize() + ".bin";
+
+            string fontName = lblFontSource.Font.Name;
+            fontName = Regex.Replace(fontName, "×", "x");
+            string targetSize = GetRenderTargetSize();
+            string fontSize = lblFontSource.Font.SizeInPoints.ToString("F2").TrimEnd('0').TrimEnd('.'); // 移除尾随的0
+            string suggestedFileName = $"{fontName} {fontSize}pt.{targetSize}.bin";
+
+            sfd.FileName = suggestedFileName;
+
+            var xtsdPath = GetXTSDCardPath();
+            sfd.Title = FrmMainCodeString.dlgSaveFileDialogTitle;
+
+            if (xtsdPath != null && AutoConfirmDialog.ShowDialog(this, FrmMainCodeString.dlgXTSDExistsDialogText + "\r\n" + xtsdPath, FrmMainCodeString.dlgXTSDExistsDialogTitle, FrmMainCodeString.dlgXTSDExistsDialogCheckBox, "save_to_xtsd"))
             {
-                return;
+                if (xtsdPath != null)
+                {
+                    if (!Directory.Exists(xtsdPath))
+                    {
+                        Directory.CreateDirectory(xtsdPath);
+                    }
+                    sfd.InitialDirectory = xtsdPath;
+                    sfd.Title += FrmMainCodeString.dlgSaveFileDialogTitleExtra;
+                }
+            }
+            else
+            {
+                xtsdPath = null;
+            }
+
+            while (true)
+            {
+                if (sfd.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                var inputFileName = sfd.FileName;
+                // 检查用户输入的文件名是否包含不应该出现的宽高信息
+                if (ContainsMultipleSizeInfo(inputFileName))
+                {
+                    var sizeInfos = ExtractAllSizeInfo(inputFileName);
+                    string detectedSizes = string.Join("\n  ", sizeInfos);
+                    string formatString = FrmMainCodeString.dlgIncorrectFileNameText;
+
+                    string message = String.Format(formatString, detectedSizes, targetSize);
+
+                    string caption = FrmMainCodeString.dlgIncorrectFileNameTitle;
+                    var result = MessageBox.Show(this, message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result == DialogResult.Yes)
+                    {
+                        sfd.FileName = suggestedFileName;
+                        if (xtsdPath != null)
+                        {
+                            sfd.InitialDirectory = xtsdPath;
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
             string savePath = sfd.FileName;
             btnDoGeneration.Enabled = false;
@@ -258,12 +397,12 @@ namespace XTEinkToolkit
                             ps.SetMessage($"{renderingMsg}({i}/{maxCharRange})");
                             renderer.RenderFont(i, fontBinary);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Console.WriteLine(ex);
                         }
                     }
-                    using(var stream = File.Create(savePath))
+                    using (var stream = File.Create(savePath))
                     {
                         fontBinary.saveToFile(stream);
                     }
@@ -274,11 +413,11 @@ namespace XTEinkToolkit
                 btnDoGeneration.Enabled = true;
                 if (err != null)
                 {
-                    MessageBox.Show(this, FrmMainCodeString.abcRenderingError+"：\r\n" + err.GetType().FullName + ": " + err.Message, FrmMainCodeString.abcRenderingError, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(this, FrmMainCodeString.abcRenderingError + "：\r\n" + err.GetType().FullName + ": " + err.Message, FrmMainCodeString.abcRenderingError, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    MessageBox.Show(this, FrmMainCodeString.abcSuccessDialogMsg, FrmMainCodeString.abcSuccessDialogTitle, MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    MessageBox.Show(this, FrmMainCodeString.abcSuccessDialogMsg, FrmMainCodeString.abcSuccessDialogTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             });
         }

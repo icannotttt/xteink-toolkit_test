@@ -282,4 +282,34 @@ IV. 用户法律责任
     <value>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.?!'";:[]{}()&lt;&gt;!@#$%^&amp;*-=_+/\|
 由于模拟排版算法限制，字体制作工具不支持英文排版效果。因此只能查看字符样式。以上是该字体中的英文字符。</value>
   </data>
+  <data name="dlgSaveFileDialogTitle" xml:space="preserve">
+    <value>保存字体文件</value>
+  </data>
+  <data name="dlgXTSDExistsDialogText" xml:space="preserve">
+    <value>检测到阅星曈SD卡已插入，是否将默认保存文件夹切换到以下位置？（若文件夹不存在则会创建）</value>
+  </data>
+  <data name="dlgIncorrectFileNameTitle" xml:space="preserve">
+    <value>文件名包含多个尺寸信息</value>
+  </data>
+  <data name="dlgIncorrectFileNameText" xml:space="preserve">
+    <value>文件名中包含多个尺寸信息，这可能会导致阅星曈设备识别异常：
+
+检测到的尺寸信息：
+  {0}
+
+实际渲染尺寸：{1}
+
+请修改文件名，确保只包含一个正确的尺寸信息。
+
+是否重新输入文件名？（推荐直接使用默认文件名）</value>
+  </data>
+  <data name="dlgSaveFileDialogTitleExtra" xml:space="preserve">
+    <value>（已定位到阅星曈存储卡字体文件夹）</value>
+  </data>
+  <data name="dlgXTSDExistsDialogCheckBox" xml:space="preserve">
+    <value>始终在阅星曈SD卡插入时选择SD卡上的字体文件夹</value>
+  </data>
+  <data name="dlgXTSDExistsDialogTitle" xml:space="preserve">
+    <value>保存到阅星曈SD卡字体文件夹</value>
+  </data>
 </root>

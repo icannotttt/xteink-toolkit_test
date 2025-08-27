@@ -282,4 +282,35 @@ IV. 用戶法律責任
     <value>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.?!'";:[]{}()&lt;&gt;!@#$%^&amp;*-=_+/\|
 由於模拟排版演算法限制，字體製作工具不支援英文排版效果。因此只能查看字元樣式。以上是該字體中的英文字元。</value>
   </data>
+  <data name="dlgSaveFileDialogTitle" xml:space="preserve">
+    <value>保存字體檔</value>
+  </data>
+  <data name="dlgXTSDExistsDialogText" xml:space="preserve">
+    <value>檢測到閱星曈SD卡已插入，是否將默認保存資料夾切換到以下位置？（若資料夾不存在則會創建）</value>
+  </data>
+  <data name="dlgIncorrectFileNameTitle" xml:space="preserve">
+    <value>檔案名包含多個尺寸資訊</value>
+  </data>
+  <data name="dlgIncorrectFileNameText" xml:space="preserve">
+    <value>檔案名中包含多個尺寸資訊，這可能會導致閱星曈設備識別異常：
+
+檢測到的尺寸資訊：
+  {0}
+
+實際渲染尺寸：{1}
+
+請修改檔案名，確保只包含一個正確的尺寸資訊。
+
+是否重新輸入檔案名？（推薦直接使用默認檔案名）
+</value>
+  </data>
+  <data name="dlgSaveFileDialogTitleExtra" xml:space="preserve">
+    <value>（已定位到閱星曈存儲卡字體資料夾）</value>
+  </data>
+  <data name="dlgXTSDExistsDialogCheckBox" xml:space="preserve">
+    <value>始終在閱星曈SD卡插入時選擇SD卡上的字體資料夾</value>
+  </data>
+  <data name="dlgXTSDExistsDialogTitle" xml:space="preserve">
+    <value>保存到閱星曈SD卡字體資料夾</value>
+  </data>
 </root>

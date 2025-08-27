@@ -39,6 +39,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.chkShowENCharacter = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.chkTraditionalChinese = new System.Windows.Forms.RadioButton();
             this.lblPreviewMessage = new System.Windows.Forms.Label();
             this.chkVerticalFont = new System.Windows.Forms.CheckBox();
@@ -65,7 +66,6 @@
             this.fontDialog = new System.Windows.Forms.FontDialog();
             this.debounceTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -164,6 +164,15 @@
             this.chkShowENCharacter.Name = "chkShowENCharacter";
             this.chkShowENCharacter.UseVisualStyleBackColor = true;
             this.chkShowENCharacter.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
+            // 
+            // radioButton1
+            // 
+            resources.ApplyResources(this.radioButton1, "radioButton1");
+            this.radioButton1.Checked = true;
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.TabStop = true;
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
             // chkTraditionalChinese
             // 
@@ -370,15 +379,6 @@
             // 
             this.debounceTimer.Interval = 1;
             this.debounceTimer.Tick += new System.EventHandler(this.debounceTimer_Tick);
-            // 
-            // radioButton1
-            // 
-            resources.ApplyResources(this.radioButton1, "radioButton1");
-            this.radioButton1.Checked = true;
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.TabStop = true;
-            this.radioButton1.UseVisualStyleBackColor = true;
-            this.radioButton1.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
             // FrmMain
             // 

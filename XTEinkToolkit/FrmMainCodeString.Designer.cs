@@ -357,5 +357,77 @@ namespace XTEinkToolkit {
                 return ResourceManager.GetString("dlgEULATitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 文件名中包含多个尺寸信息，这可能会导致阅星曈设备识别异常：
+        ///
+        ///检测到的尺寸信息：
+        ///  {0}
+        ///
+        ///实际渲染尺寸：{1}
+        ///
+        ///请修改文件名，确保只包含一个正确的尺寸信息。
+        ///
+        ///是否重新输入文件名？（推荐直接使用默认文件名） 的本地化字符串。
+        /// </summary>
+        internal static string dlgIncorrectFileNameText {
+            get {
+                return ResourceManager.GetString("dlgIncorrectFileNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 文件名包含多个尺寸信息 的本地化字符串。
+        /// </summary>
+        internal static string dlgIncorrectFileNameTitle {
+            get {
+                return ResourceManager.GetString("dlgIncorrectFileNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 保存字体文件 的本地化字符串。
+        /// </summary>
+        internal static string dlgSaveFileDialogTitle {
+            get {
+                return ResourceManager.GetString("dlgSaveFileDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 （已定位到阅星曈存储卡字体文件夹） 的本地化字符串。
+        /// </summary>
+        internal static string dlgSaveFileDialogTitleExtra {
+            get {
+                return ResourceManager.GetString("dlgSaveFileDialogTitleExtra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 始终在阅星曈SD卡插入时选择SD卡上的字体文件夹 的本地化字符串。
+        /// </summary>
+        internal static string dlgXTSDExistsDialogCheckBox {
+            get {
+                return ResourceManager.GetString("dlgXTSDExistsDialogCheckBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 检测到阅星曈SD卡已插入，是否将默认保存文件夹切换到以下位置？（若文件夹不存在则会创建） 的本地化字符串。
+        /// </summary>
+        internal static string dlgXTSDExistsDialogText {
+            get {
+                return ResourceManager.GetString("dlgXTSDExistsDialogText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 保存到阅星曈SD卡字体文件夹 的本地化字符串。
+        /// </summary>
+        internal static string dlgXTSDExistsDialogTitle {
+            get {
+                return ResourceManager.GetString("dlgXTSDExistsDialogTitle", resourceCulture);
+            }
+        }
     }
 }
