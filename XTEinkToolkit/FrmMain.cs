@@ -201,6 +201,8 @@ namespace XTEinkToolkit
             renderer.LineSpacingPx = (int)numLineSpacing.Value;
             renderer.LightThrehold = numFontGamma.Value;
             renderer.IsVerticalFont = chkVerticalFont.Checked;
+            renderer.IsOldLineAlignment = chkOldLineAlignment.Checked;
+            renderer.RenderBorder = chkShowBorderInBinaryFont.Checked;
             XTEinkFontRenderer.AntiAltasMode[] aaModesEnum = new XTEinkFontRenderer.AntiAltasMode[] {
                     XTEinkFontRenderer.AntiAltasMode.System1Bit, // 0x0
                     XTEinkFontRenderer.AntiAltasMode.System1BitGridFit, // 0x1
@@ -294,8 +296,15 @@ namespace XTEinkToolkit
                 return null;
             }
         }
+        private void requireUpdatePreview(object sender, EventArgs e)
+        {
+            DoPreview();
+        }
 
-
+        private void btnAdvancedOptions_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            mnuAdvancedOptions.Show(btnAdvancedOptions, 0, btnAdvancedOptions.Height);
+        }
 
         private void btnDoGeneration_Click(object sender, EventArgs e)
         {
@@ -421,7 +430,6 @@ namespace XTEinkToolkit
                 }
             });
         }
-
 
     }
 }

@@ -29,6 +29,8 @@ namespace XTEinkTools
         public int CharSpacingPx { get; set; } = 0;
         public bool IsVerticalFont { get; set; } = false;
         public Font Font { get; set; } = SystemFonts.DefaultFont;
+        public bool IsOldLineAlignment { get; set; }
+        public bool RenderBorder { get; set; }
 
         private Bitmap _tempRenderSurface;
         private Graphics _tempGraphics;
@@ -131,22 +133,37 @@ namespace XTEinkTools
             syncSettings();
             char chr = (char)charCodePoint;
             this._tempGraphics.Clear(Color.Black);
+
             this._tempGraphics.ResetTransform();
+            if (RenderBorder)
+            {
+                this._tempGraphics.DrawRectangle(Pens.White, 0, 0, renderer.Width - 1, renderer.Height - 1);
+            }
             if (IsVerticalFont)
             {
                 this._tempGraphics.TranslateTransform(0,renderer.Height);
                 this._tempGraphics.RotateTransform(-90);
             }
 
-            if (IsVerticalFont)
-            {
+            bool shouldSetLineAlignmentToCenter = true;
 
-                    this._tempGraphics.TranslateTransform(LineSpacingPx / 2,0);
+
+            if (IsOldLineAlignment)
+            {
+                shouldSetLineAlignmentToCenter = LineSpacingPx < 0;
             }
-            else
+            if (shouldSetLineAlignmentToCenter)
             {
+                if (IsVerticalFont)
+                {
 
-                this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
+                    this._tempGraphics.TranslateTransform(LineSpacingPx / 2, 0);
+                }
+                else
+                {
+
+                    this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
+                }
             }
             if (CharSpacingPx != 0 && charCodePoint > 255)
             {
@@ -163,6 +180,7 @@ namespace XTEinkTools
             }
 
             this._tempGraphics.DrawString(chr.ToString(), this.Font, Brushes.White, 0,0, _format);
+            
             renderer.LoadFromBitmap(charCodePoint, _tempRenderSurface, 0, 0, this.LightThrehold);
         }
 

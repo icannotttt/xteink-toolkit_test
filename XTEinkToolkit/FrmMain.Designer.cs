@@ -33,10 +33,10 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnPreview = new System.Windows.Forms.LinkLabel();
-            this.previewSurface = new XTEinkToolkit.Controls.CanvasControl();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnAdvancedOptions = new System.Windows.Forms.LinkLabel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.chkShowENCharacter = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
@@ -66,6 +66,10 @@
             this.fontDialog = new System.Windows.Forms.FontDialog();
             this.debounceTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.mnuAdvancedOptions = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.chkShowBorderInBinaryFont = new System.Windows.Forms.ToolStripMenuItem();
+            this.chkOldLineAlignment = new System.Windows.Forms.ToolStripMenuItem();
+            this.previewSurface = new XTEinkToolkit.Controls.CanvasControl();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -76,6 +80,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numCharSpacing)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineSpacing)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFontSizePt)).BeginInit();
+            this.mnuAdvancedOptions.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -100,15 +105,6 @@
             this.btnPreview.TabStop = true;
             this.btnPreview.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnPreview_LinkClicked);
             // 
-            // previewSurface
-            // 
-            this.previewSurface.BackColor = System.Drawing.Color.Silver;
-            this.previewSurface.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.previewSurface.CanvasSize = new System.Drawing.Size(100, 100);
-            resources.ApplyResources(this.previewSurface, "previewSurface");
-            this.previewSurface.Name = "previewSurface";
-            this.previewSurface.ScaleMode = XTEinkToolkit.Controls.CanvasControl.RenderScaleMode.Zoom;
-            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.panel3);
@@ -124,6 +120,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnAdvancedOptions);
             this.groupBox2.Controls.Add(this.panel4);
             this.groupBox2.Controls.Add(this.lblPreviewMessage);
             this.groupBox2.Controls.Add(this.chkVerticalFont);
@@ -149,6 +146,14 @@
             resources.ApplyResources(this.groupBox2, "groupBox2");
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.TabStop = false;
+            // 
+            // btnAdvancedOptions
+            // 
+            resources.ApplyResources(this.btnAdvancedOptions, "btnAdvancedOptions");
+            this.btnAdvancedOptions.Name = "btnAdvancedOptions";
+            this.btnAdvancedOptions.TabStop = true;
+            this.btnAdvancedOptions.VisitedLinkColor = System.Drawing.Color.Blue;
+            this.btnAdvancedOptions.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.btnAdvancedOptions_LinkClicked);
             // 
             // panel4
             // 
@@ -380,6 +385,37 @@
             this.debounceTimer.Interval = 1;
             this.debounceTimer.Tick += new System.EventHandler(this.debounceTimer_Tick);
             // 
+            // mnuAdvancedOptions
+            // 
+            this.mnuAdvancedOptions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.chkShowBorderInBinaryFont,
+            this.chkOldLineAlignment});
+            this.mnuAdvancedOptions.Name = "mnuAdvancedOptions";
+            resources.ApplyResources(this.mnuAdvancedOptions, "mnuAdvancedOptions");
+            // 
+            // chkShowBorderInBinaryFont
+            // 
+            this.chkShowBorderInBinaryFont.CheckOnClick = true;
+            this.chkShowBorderInBinaryFont.Name = "chkShowBorderInBinaryFont";
+            resources.ApplyResources(this.chkShowBorderInBinaryFont, "chkShowBorderInBinaryFont");
+            this.chkShowBorderInBinaryFont.Click += new System.EventHandler(this.requireUpdatePreview);
+            // 
+            // chkOldLineAlignment
+            // 
+            this.chkOldLineAlignment.CheckOnClick = true;
+            this.chkOldLineAlignment.Name = "chkOldLineAlignment";
+            resources.ApplyResources(this.chkOldLineAlignment, "chkOldLineAlignment");
+            this.chkOldLineAlignment.Click += new System.EventHandler(this.requireUpdatePreview);
+            // 
+            // previewSurface
+            // 
+            this.previewSurface.BackColor = System.Drawing.Color.Silver;
+            this.previewSurface.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.previewSurface.CanvasSize = new System.Drawing.Size(100, 100);
+            resources.ApplyResources(this.previewSurface, "previewSurface");
+            this.previewSurface.Name = "previewSurface";
+            this.previewSurface.ScaleMode = XTEinkToolkit.Controls.CanvasControl.RenderScaleMode.Zoom;
+            // 
             // FrmMain
             // 
             resources.ApplyResources(this, "$this");
@@ -400,6 +436,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numCharSpacing)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineSpacing)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFontSizePt)).EndInit();
+            this.mnuAdvancedOptions.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -442,6 +479,10 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.LinkLabel btnAdvancedOptions;
+        private System.Windows.Forms.ContextMenuStrip mnuAdvancedOptions;
+        private System.Windows.Forms.ToolStripMenuItem chkShowBorderInBinaryFont;
+        private System.Windows.Forms.ToolStripMenuItem chkOldLineAlignment;
     }
 }
 
