@@ -16,7 +16,10 @@ namespace XTEinkTools
         None = 1,        // 无超采样
         x2 = 2,          // 2倍超采样
         x4 = 4,          // 4倍超采样
-        x8 = 8           // 8倍超采样（高质量模式）
+        x8 = 8,          // 8倍超采样（高质量模式）
+        x16 = 16,        // 16倍超采样（超高质量）
+        x32 = 32,        // 32倍超采样（极致质量）
+        x64 = 64         // 64倍超采样（终极质量）
     }
 
     /// <summary>
@@ -530,6 +533,15 @@ namespace XTEinkTools
                     break;
                 case SuperSamplingMode.x8:
                     baseCompensation = 28;  // 8倍采样：较大补偿
+                    break;
+                case SuperSamplingMode.x16:
+                    baseCompensation = 35;  // 16倍采样：超高补偿
+                    break;
+                case SuperSamplingMode.x32:
+                    baseCompensation = 42;  // 32倍采样：极致补偿
+                    break;
+                case SuperSamplingMode.x64:
+                    baseCompensation = 48;  // 64倍采样：终极补偿
                     break;
                 default:
                     baseCompensation = 0;

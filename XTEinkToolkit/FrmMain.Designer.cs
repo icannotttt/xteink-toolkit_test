@@ -1,4 +1,4 @@
-﻿namespace XTEinkToolkit
+﻿﻿namespace XTEinkToolkit
 {
     partial class FrmMain
     {
@@ -198,7 +198,10 @@
             "无 (1x)",
             "2倍采样 (2x)",
             "4倍采样 (4x)",
-            "8倍采样 (8x)"});
+            "8倍采样 (8x)",
+            "16倍采样 (16x) - 超高质量",
+            "32倍采样 (32x) - 极致质量",
+            "64倍采样 (64x) - 终极质量"});
             resources.ApplyResources(this.cmbSuperSampling, "cmbSuperSampling");
             this.cmbSuperSampling.Name = "cmbSuperSampling";
             this.cmbSuperSampling.SelectedIndexChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
