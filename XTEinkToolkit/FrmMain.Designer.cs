@@ -41,8 +41,7 @@
             this.chkShowENCharacter = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.chkTraditionalChinese = new System.Windows.Forms.RadioButton();
-            this.cmbSuperSampling = new System.Windows.Forms.ComboBox();
-            this.lblSuperSampling = new System.Windows.Forms.Label();
+            this.chkSuperSampling = new System.Windows.Forms.CheckBox();
             this.lblPreviewMessage = new System.Windows.Forms.Label();
             this.chkVerticalFont = new System.Windows.Forms.CheckBox();
             this.chkShowBorder = new System.Windows.Forms.CheckBox();
@@ -159,8 +158,7 @@
             // 
             // panel4
             // 
-            this.panel4.Controls.Add(this.cmbSuperSampling);
-            this.panel4.Controls.Add(this.lblSuperSampling);
+            this.panel4.Controls.Add(this.chkSuperSampling);
             this.panel4.Controls.Add(this.chkShowENCharacter);
             this.panel4.Controls.Add(this.radioButton1);
             this.panel4.Controls.Add(this.chkTraditionalChinese);
@@ -190,26 +188,12 @@
             this.chkTraditionalChinese.UseVisualStyleBackColor = true;
             this.chkTraditionalChinese.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             // 
-            // cmbSuperSampling
+            // chkSuperSampling
             //
-            this.cmbSuperSampling.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbSuperSampling.FormattingEnabled = true;
-            this.cmbSuperSampling.Items.AddRange(new object[] {
-            "无 (1x)",
-            "2倍采样",
-            "4倍采样",
-            "8倍采样",
-            "16倍采样",
-            "32倍采样",
-            "64倍采样"});
-            resources.ApplyResources(this.cmbSuperSampling, "cmbSuperSampling");
-            this.cmbSuperSampling.Name = "cmbSuperSampling";
-            this.cmbSuperSampling.SelectedIndexChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
-            //
-            // lblSuperSampling
-            //
-            resources.ApplyResources(this.lblSuperSampling, "lblSuperSampling");
-            this.lblSuperSampling.Name = "lblSuperSampling";
+            resources.ApplyResources(this.chkSuperSampling, "chkSuperSampling");
+            this.chkSuperSampling.Name = "chkSuperSampling";
+            this.chkSuperSampling.UseVisualStyleBackColor = true;
+            this.chkSuperSampling.CheckedChanged += new System.EventHandler(this.chkRenderGridFit_CheckedChanged);
             //
             // lblPreviewMessage
             // 
@@ -494,8 +478,7 @@
         private System.Windows.Forms.Label lblPreviewMessage;
         private System.Windows.Forms.CheckBox chkLandspace;
         private System.Windows.Forms.RadioButton chkTraditionalChinese;
-        private System.Windows.Forms.ComboBox cmbSuperSampling;
-        private System.Windows.Forms.Label lblSuperSampling;
+        private System.Windows.Forms.CheckBox chkSuperSampling;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkVerticalFont;
         private System.Windows.Forms.Button btnChooseFontFile;

@@ -67,27 +67,11 @@ namespace XTEinkToolkit
         private void InitializeSuperSamplingControls()
         {
             // 设置标签文本
-            lblSuperSampling.Text = "超采样模式：";
-
-            // 确保下拉框有选项（防止Designer.cs中的设置失效）
-            if (cmbSuperSampling.Items.Count == 0)
-            {
-                cmbSuperSampling.Items.Clear();
-                cmbSuperSampling.Items.AddRange(new object[] {
-                    "无 (1x)",
-                    "2倍采样 (2x)",
-                    "4倍采样 (4x)",
-                    "8倍采样 (8x)"
-                });
-            }
-
-            // 设置默认选中项为"无 (1x)"
-            cmbSuperSampling.SelectedIndex = 0;
-
+            // 设置CheckBox默认不勾选
+            chkSuperSampling.Checked = false;
 
             // 设置工具提示
-            toolTip1.SetToolTip(cmbSuperSampling, "超采样可以显著提升小字号的渲染清晰度，但会增加处理时间");
-            toolTip1.SetToolTip(lblSuperSampling, "超采样通过高分辨率渲染再缩放来提升字体质量");
+            toolTip1.SetToolTip(chkSuperSampling, "启用256x终极超采样，实现激光打印级字体质量，但会增加处理时间");
         }
 
 
@@ -248,14 +232,8 @@ namespace XTEinkToolkit
             renderer.CharSpacingPx = (int)numCharSpacing.Value;
             renderer.AAMode = aaModesEnum[whichAAMode];
 
-            // 配置SuperSampling模式
-            XTEinkTools.SuperSamplingMode[] superSamplingModes = new XTEinkTools.SuperSamplingMode[] {
-                XTEinkTools.SuperSamplingMode.None,  // 0 - "无 (1x)"
-                XTEinkTools.SuperSamplingMode.x2,    // 1 - "2倍采样 (2x)"
-                XTEinkTools.SuperSamplingMode.x4,    // 2 - "4倍采样 (4x)"
-                XTEinkTools.SuperSamplingMode.x8     // 3 - "8倍采样 (8x)"
-            };
-            renderer.SuperSampling = superSamplingModes[Math.Max(0, Math.Min(cmbSuperSampling.SelectedIndex, superSamplingModes.Length - 1))];
+            // 配置SuperSampling模式：勾选=启用256x终极超采样，不勾选=无超采样
+            renderer.EnableUltimateSuperSampling = chkSuperSampling.Checked;
 
         }
 

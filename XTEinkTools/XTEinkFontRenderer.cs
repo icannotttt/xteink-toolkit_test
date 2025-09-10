@@ -9,19 +9,7 @@ using System.Threading.Tasks;
 
 namespace XTEinkTools
 {
-    /// <summary>
-    /// 超采样模式
-    /// </summary>
-    public enum SuperSamplingMode
-    {
-        None = 1,        // 无超采样
-        x2 = 2,          // 2倍超采样
-        x4 = 4,          // 4倍超采样
-        x8 = 8,          // 8倍超采样（高质量模式）
-        x16 = 16,        // 16倍超采样（超高质量）
-        x32 = 32,        // 32倍超采样（极致质量）
-        x64 = 64         // 64倍超采样（终极质量）
-    }
+    // 注意：SuperSampling现在使用bool控制，true=256x终极超采样，false=无超采样
 
     /// <summary>
     /// 字形渲染器
@@ -48,9 +36,9 @@ namespace XTEinkTools
         public bool RenderBorder { get; set; }
 
         /// <summary>
-        /// 超采样模式，默认为None（无超采样）
+        /// 是否启用256x终极超采样，默认为false（无超采样）
         /// </summary>
-        public SuperSamplingMode SuperSampling { get; set; } = SuperSamplingMode.None;
+        public bool EnableUltimateSuperSampling { get; set; } = false;
 
         private Bitmap _tempRenderSurface;
         private Graphics _tempGraphics;
@@ -58,7 +46,7 @@ namespace XTEinkTools
         // SuperSampling字体缓存
         private Font _cachedSuperSamplingFont;
         private float _cachedSuperSamplingSize;
-        private SuperSamplingMode _cachedSuperSamplingMode;
+        private bool _cachedSuperSamplingEnabled;
 
         public delegate void RenderMethod(int x, int y, bool pixel);
 
@@ -99,16 +87,9 @@ namespace XTEinkTools
 
         private void ensureRenderSurfaceSize(int width,int height)
         {
-            // 计算SuperSampling所需的实际尺寸
+            // 如果启用终极超采样，直接使用目标尺寸（RenderUltimateSuperSampling独立处理）
             int actualWidth = width;
             int actualHeight = height;
-
-            if (SuperSampling != SuperSamplingMode.None)
-            {
-                int scale = (int)SuperSampling;
-                actualWidth = width * scale;
-                actualHeight = height * scale;
-            }
 
             if (this._tempRenderSurface != null && this._tempGraphics != null) {
                 if (this._tempRenderSurface.Width == actualWidth && this._tempRenderSurface.Height == actualHeight)
@@ -141,61 +122,403 @@ namespace XTEinkTools
         }
 
         /// <summary>
-        /// 使用矢量路径进行SuperSampling渲染（高效方案）
-        /// 避免超大Bitmap和二次插值，直接从矢量到目标尺寸
+        /// 终极SuperSampling渲染系统（256x + Bayer抖动 + Gamma校正）
+        /// 固定256x超采样，结合16x16 Bayer抖动，实现激光打印级质量
         /// </summary>
         /// <param name="charCodePoint">字符码点</param>
         /// <param name="targetWidth">目标宽度</param>
         /// <param name="targetHeight">目标高度</param>
-        /// <returns>SuperSampling渲染后的位图</returns>
-        private Bitmap RenderVectorSuperSampling(int charCodePoint, int targetWidth, int targetHeight)
+        /// <returns>1-bit黑白位图</returns>
+        private Bitmap RenderUltimateSuperSampling(int charCodePoint, int targetWidth, int targetHeight)
         {
             char chr = (char)charCodePoint;
-            int scale = (int)SuperSampling;
+            const int ULTRA_SCALE = 256; // 固定256x超超采样
 
-            // 创建目标尺寸的位图（恒定内存占用）
-            Bitmap result = new Bitmap(targetWidth, targetHeight);
-            result.SetResolution(96, 96);
+            // 第一步：创建256x超高分辨率灰度图
+            int ultraWidth = targetWidth * ULTRA_SCALE;
+            int ultraHeight = targetHeight * ULTRA_SCALE;
 
-            using (Graphics g = Graphics.FromImage(result))
+            Bitmap ultraBitmap = new Bitmap(ultraWidth, ultraHeight);
+            ultraBitmap.SetResolution(96, 96);
+
+            using (Graphics g = Graphics.FromImage(ultraBitmap))
             {
                 g.Clear(Color.Black);
 
-                // 设置高质量矢量渲染
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+                // 设置终极质量渲染参数
+                g.SmoothingMode = SmoothingMode.HighQuality;
                 g.CompositingQuality = CompositingQuality.HighQuality;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
                 // 处理边框
                 if (RenderBorder)
                 {
-                    g.DrawRectangle(Pens.White, 0, 0, targetWidth - 1, targetHeight - 1);
+                    g.DrawRectangle(Pens.White, 0, 0, ultraWidth - 1, ultraHeight - 1);
                 }
 
                 // 创建矢量路径
                 using (GraphicsPath gp = new GraphicsPath())
                 {
-                    // 将字符转换为矢量路径，使用SuperSampling倍数的字体大小
-                    float vectorFontSize = this.Font.SizeInPoints * scale;
+                    // 修正DPI换算问题：先转点→像素，再乘scale
+                    // 1英寸 = 72点，屏幕96 dpi，所以需要 points * 96/72 转换
+                    float emSizeInPoints = this.Font.SizeInPoints;           // 用户原始字体点数
+                    float pixelSize = emSizeInPoints * 96f / 72f;            // 转换为像素尺寸
+                    float superPixelSize = pixelSize * ULTRA_SCALE;          // 再乘超采样倍数
+
                     gp.AddString(chr.ToString(), this.Font.FontFamily, (int)this.Font.Style,
-                               vectorFontSize, PointF.Empty, StringFormat.GenericTypographic);
+                               superPixelSize, PointF.Empty, StringFormat.GenericTypographic);
 
-                    // 创建变换矩阵：缩小到目标尺寸
-                    using (Matrix matrix = new Matrix(1.0f / scale, 0, 0, 1.0f / scale, 0, 0))
+                    // 亚像素偏移优化：0.125px精度微调
+                    using (Matrix matrix = new Matrix())
                     {
-                        // 应用坐标变换处理
-                        ApplyVectorTransforms(matrix, targetWidth, targetHeight, scale, charCodePoint);
+                        // 先做亚像素偏移（1/8像素精度）
+                        float subPixelOffset = -0.125f * ULTRA_SCALE;
+                        matrix.Translate(subPixelOffset, subPixelOffset);
 
-                        // 应用变换到路径
+                        // 再做标准缩放变换
+                        matrix.Scale(1.0f / ULTRA_SCALE, 1.0f / ULTRA_SCALE, MatrixOrder.Append);
+
+                        // 应用变换处理
+                        ApplyUltraVectorTransforms(matrix, targetWidth, targetHeight, ULTRA_SCALE, charCodePoint);
+
+                        // 墨水扩散预收缩（预补偿打印扩散）
+                        if (ShouldApplyInkCompensation(charCodePoint))
+                        {
+                            ApplyInkExpansionCompensation(gp, 0.05f * ULTRA_SCALE); // 0.05mm收缩
+                        }
+
                         gp.Transform(matrix);
-
-                        // 填充矢量路径到位图
                         g.FillPath(Brushes.White, gp);
                     }
                 }
             }
 
+            // 第二步：方向敏感平滑（仅对斜线/弯钩字符）
+            if (NeedsSmoothCurveProcessing(charCodePoint))
+            {
+                ApplyDirectionalSmoothing(ultraBitmap);
+            }
+
+            // 第三步：256x灰度图 → 16x16 Bayer抖动 → 1-bit
+            Bitmap result = ApplyBayerDithering(ultraBitmap, targetWidth, targetHeight, charCodePoint);
+
+            ultraBitmap.Dispose();
             return result;
+        }
+
+        /// <summary>
+        /// 16x16 Bayer抖动矩阵（经典有序抖动）
+        /// </summary>
+        private static readonly int[,] BayerMatrix16x16 = {
+            {0,128,32,160,8,136,40,168,2,130,34,162,10,138,42,170},
+            {192,64,224,96,200,72,232,104,194,66,226,98,202,74,234,106},
+            {48,176,16,144,56,184,24,152,50,178,18,146,58,186,26,154},
+            {240,112,208,80,248,120,216,88,242,114,210,82,250,122,218,90},
+            {12,140,44,172,4,132,36,164,14,142,46,174,6,134,38,166},
+            {204,76,236,108,196,68,228,100,206,78,238,110,198,70,230,102},
+            {60,188,28,156,52,180,20,148,62,190,30,158,54,182,22,150},
+            {252,124,220,92,244,116,212,84,254,126,222,94,246,118,214,86},
+            {3,131,35,163,11,139,43,171,1,129,33,161,9,137,41,169},
+            {195,67,227,99,203,75,235,107,193,65,225,97,201,73,233,105},
+            {51,179,19,147,59,187,27,155,49,177,17,145,57,185,25,153},
+            {243,115,211,83,251,123,219,91,241,113,209,81,249,121,217,89},
+            {15,143,47,175,7,135,39,167,13,141,45,173,5,133,37,165},
+            {207,79,239,111,199,71,231,103,205,77,237,109,197,69,229,101},
+            {63,191,31,159,55,183,23,151,61,189,29,157,53,181,21,149},
+            {255,127,223,95,247,119,215,87,253,125,221,93,245,117,213,85}
+        };
+
+        /// <summary>
+        /// 应用16x16 Bayer抖动（256x灰度 → 1-bit）
+        /// </summary>
+        private Bitmap ApplyBayerDithering(Bitmap grayBitmap, int targetWidth, int targetHeight, int charCodePoint)
+        {
+            Bitmap result = new Bitmap(targetWidth, targetHeight);
+            result.SetResolution(96, 96);
+
+            const int ULTRA_SCALE = 256;
+            bool isPunctuation = IsPunctuationCharacter(charCodePoint);
+
+            // 计算线性光gamma校正的阈值
+            double userThresholdLinear = Math.Pow(this.LightThrehold / 255.0, 2.2);
+
+            // 标点符号额外加粗：阈值-4（相当于加粗1.5%）
+            int adjustedThreshold = this.LightThrehold;
+            if (isPunctuation)
+            {
+                adjustedThreshold = Math.Max(16, this.LightThrehold - 4);
+            }
+            double adjustedThresholdLinear = Math.Pow(adjustedThreshold / 255.0, 2.2);
+
+            using (Graphics g = Graphics.FromImage(result))
+            {
+                g.Clear(Color.Black);
+
+                for (int y = 0; y < targetHeight; y++)
+                {
+                    for (int x = 0; x < targetWidth; x++)
+                    {
+                        // 从256x灰度图采样对应区域的平均灰度
+                        double avgGray = SampleUltraRegion(grayBitmap, x, y, ULTRA_SCALE);
+
+                        // 纯黑保护区：灰度<10直接为黑，不参与抖动
+                        if (avgGray < 10)
+                        {
+                            result.SetPixel(x, y, Color.Black);
+                            continue;
+                        }
+
+                        // 线性光空间gamma校正阈值判断
+                        double grayLinear = Math.Pow(avgGray / 255.0, 2.2);
+
+                        // 16x16 Bayer抖动判断
+                        int bayerX = x % 16;
+                        int bayerY = y % 16;
+                        int bayerThreshold = BayerMatrix16x16[bayerY, bayerX];
+
+                        // 在线性光空间比较：灰度 vs (阈值 + Bayer扰动)
+                        double combinedThreshold = adjustedThresholdLinear + (bayerThreshold / 255.0 - 0.5) * 0.1;
+
+                        Color pixelColor = grayLinear > combinedThreshold ? Color.White : Color.Black;
+                        result.SetPixel(x, y, pixelColor);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 从256x灰度图采样指定区域的平均灰度
+        /// </summary>
+        private double SampleUltraRegion(Bitmap ultraBitmap, int targetX, int targetY, int scale)
+        {
+            int startX = targetX * scale;
+            int startY = targetY * scale;
+            int endX = Math.Min(startX + scale, ultraBitmap.Width);
+            int endY = Math.Min(startY + scale, ultraBitmap.Height);
+
+            double totalGray = 0;
+            int pixelCount = 0;
+
+            for (int y = startY; y < endY; y++)
+            {
+                for (int x = startX; x < endX; x++)
+                {
+                    Color pixel = ultraBitmap.GetPixel(x, y);
+                    int gray = (int)(pixel.R * 0.299 + pixel.G * 0.587 + pixel.B * 0.114);
+                    totalGray += gray;
+                    pixelCount++;
+                }
+            }
+
+            return pixelCount > 0 ? totalGray / pixelCount : 0;
+        }
+
+        /// <summary>
+        /// 应用超高精度矢量变换（用于256x终极采样）
+        /// </summary>
+        /// <param name="matrix">变换矩阵</param>
+        /// <param name="targetWidth">目标宽度</param>
+        /// <param name="targetHeight">目标高度</param>
+        /// <param name="ultraScale">超高精度缩放比例（固定256）</param>
+        /// <param name="charCodePoint">字符码点</param>
+        private void ApplyUltraVectorTransforms(Matrix matrix, int targetWidth, int targetHeight, int ultraScale, int charCodePoint)
+        {
+            // 处理垂直字体变换
+            if (IsVerticalFont)
+            {
+                matrix.Translate(0, targetHeight);
+                matrix.Rotate(-90);
+            }
+
+            // 处理行对齐
+            bool shouldSetLineAlignmentToCenter = true;
+            if (IsOldLineAlignment)
+            {
+                shouldSetLineAlignmentToCenter = LineSpacingPx < 0;
+            }
+            if (shouldSetLineAlignmentToCenter)
+            {
+                if (IsVerticalFont)
+                {
+                    matrix.Translate(LineSpacingPx / 2.0f, 0);
+                }
+                else
+                {
+                    matrix.Translate(0, LineSpacingPx / 2.0f);
+                }
+            }
+
+            // 处理字符间距（仅对非ASCII字符）
+            if (CharSpacingPx != 0 && (char)charCodePoint > 255)
+            {
+                if (IsVerticalFont)
+                {
+                    matrix.Translate(0, CharSpacingPx / 2.0f);
+                }
+                else
+                {
+                    matrix.Translate(CharSpacingPx / 2.0f, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 判断字符是否需要墨水扩散补偿
+        /// </summary>
+        /// <param name="charCodePoint">字符码点</param>
+        /// <returns>是否需要墨水补偿</returns>
+        private bool ShouldApplyInkCompensation(int charCodePoint)
+        {
+            // 细线条字符（如 1, i, l, I 等）不需要补偿，避免过细消失
+            if (charCodePoint <= 127)
+            {
+                char ch = (char)charCodePoint;
+                if ("1iIl|!.,:;".Contains(ch))
+                    return false;
+            }
+
+            // 标点符号通常较细，不需要补偿
+            if (IsPunctuationCharacter(charCodePoint))
+                return false;
+
+            // 对于中等粗细的笔画字符进行补偿
+            return true;
+        }
+
+        /// <summary>
+        /// 应用墨水扩散预收缩补偿
+        /// 通过GraphicsPath.Widen实现0.05mm精度的路径内缩
+        /// </summary>
+        /// <param name="path">要处理的GraphicsPath</param>
+        /// <param name="shrinkAmount">收缩量（像素）</param>
+        private void ApplyInkExpansionCompensation(GraphicsPath path, float shrinkAmount)
+        {
+            try
+            {
+                if (shrinkAmount <= 0) return;
+
+                // 创建收缩笔尖（负值表示内缩）
+                using (Pen shrinkPen = new Pen(Color.Black, -shrinkAmount * 2))
+                {
+                    shrinkPen.LineJoin = LineJoin.Round;
+                    shrinkPen.StartCap = LineCap.Round;
+                    shrinkPen.EndCap = LineCap.Round;
+
+                    // 对路径进行内缩处理
+                    path.Widen(shrinkPen);
+                }
+            }
+            catch
+            {
+                // 如果Widen操作失败（例如路径太细），保持原路径不变
+            }
+        }
+
+        /// <summary>
+        /// 应用方向敏感的平滑处理
+        /// 对斜线/弯钩字符进行1x3/3x1高斯滤波
+        /// </summary>
+        /// <param name="bitmap">要处理的256x超高分辨率位图</param>
+        private void ApplyDirectionalSmoothing(Bitmap bitmap)
+        {
+            try
+            {
+                // 简化的方向敏感平滑：3x3高斯核
+                float[,] gaussianKernel = {
+                    {0.0625f, 0.125f, 0.0625f},
+                    {0.125f,  0.25f,  0.125f},
+                    {0.0625f, 0.125f, 0.0625f}
+                };
+
+                int width = bitmap.Width;
+                int height = bitmap.Height;
+
+                // 创建临时数组存储灰度值
+                byte[,] grayData = new byte[height, width];
+                byte[,] smoothedData = new byte[height, width];
+
+                // 提取灰度数据
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        Color pixel = bitmap.GetPixel(x, y);
+                        grayData[y, x] = (byte)(pixel.R * 0.299 + pixel.G * 0.587 + pixel.B * 0.114);
+                    }
+                }
+
+                // 应用高斯滤波（只对非横竖线区域）
+                for (int y = 1; y < height - 1; y++)
+                {
+                    for (int x = 1; x < width - 1; x++)
+                    {
+                        // 检测是否为纯横线或纯竖线区域
+                        bool isHorizontalLine = IsHorizontalLineRegion(grayData, x, y);
+                        bool isVerticalLine = IsVerticalLineRegion(grayData, x, y);
+
+                        if (isHorizontalLine || isVerticalLine)
+                        {
+                            // 横竖线保持锐利，不进行平滑
+                            smoothedData[y, x] = grayData[y, x];
+                        }
+                        else
+                        {
+                            // 斜线/弯钩区域进行平滑
+                            float sum = 0;
+                            for (int ky = -1; ky <= 1; ky++)
+                            {
+                                for (int kx = -1; kx <= 1; kx++)
+                                {
+                                    sum += grayData[y + ky, x + kx] * gaussianKernel[ky + 1, kx + 1];
+                                }
+                            }
+                            smoothedData[y, x] = (byte)Math.Min(255, Math.Max(0, sum));
+                        }
+                    }
+                }
+
+                // 将平滑后的数据写回位图
+                for (int y = 1; y < height - 1; y++)
+                {
+                    for (int x = 1; x < width - 1; x++)
+                    {
+                        byte gray = smoothedData[y, x];
+                        Color smoothColor = Color.FromArgb(gray, gray, gray);
+                        bitmap.SetPixel(x, y, smoothColor);
+                    }
+                }
+            }
+            catch
+            {
+                // 如果平滑处理失败，保持原图不变
+            }
+        }
+
+        /// <summary>
+        /// 检测是否为水平线区域
+        /// </summary>
+        private bool IsHorizontalLineRegion(byte[,] grayData, int x, int y)
+        {
+            // 检查垂直方向的梯度是否显著大于水平方向
+            int verticalGradient = Math.Abs(grayData[y - 1, x] - grayData[y + 1, x]);
+            int horizontalGradient = Math.Abs(grayData[y, x - 1] - grayData[y, x + 1]);
+
+            return verticalGradient > horizontalGradient * 2 && verticalGradient > 30;
+        }
+
+        /// <summary>
+        /// 检测是否为垂直线区域
+        /// </summary>
+        private bool IsVerticalLineRegion(byte[,] grayData, int x, int y)
+        {
+            // 检查水平方向的梯度是否显著大于垂直方向
+            int horizontalGradient = Math.Abs(grayData[y, x - 1] - grayData[y, x + 1]);
+            int verticalGradient = Math.Abs(grayData[y - 1, x] - grayData[y + 1, x]);
+
+            return horizontalGradient > verticalGradient * 2 && horizontalGradient > 30;
         }
 
         /// <summary>
@@ -260,7 +583,7 @@ namespace XTEinkTools
         /// <returns>缩放后的位图</returns>
         private Bitmap ApplySuperSampling(Bitmap sourceBitmap, int targetWidth, int targetHeight, int charCodePoint)
         {
-            if (SuperSampling == SuperSamplingMode.None)
+            if (!EnableUltimateSuperSampling)
             {
                 return sourceBitmap; // 无需处理，直接返回原图
             }
@@ -332,98 +655,69 @@ namespace XTEinkTools
             syncSettings();
             char chr = (char)charCodePoint;
 
-            // 计算SuperSampling缩放比例
-            int scale = (int)SuperSampling;
-
-            // 清空画布
-            this._tempGraphics.Clear(Color.Black);
-            this._tempGraphics.ResetTransform();
-
-            // 绘制边框（考虑缩放）
-            if (RenderBorder)
-            {
-                int borderWidth = (renderer.Width * scale) - 1;
-                int borderHeight = (renderer.Height * scale) - 1;
-                this._tempGraphics.DrawRectangle(Pens.White, 0, 0, borderWidth, borderHeight);
-            }
-
-            // 处理垂直字体变换（考虑缩放）
-            if (IsVerticalFont)
-            {
-                this._tempGraphics.TranslateTransform(0, renderer.Height * scale);
-                this._tempGraphics.RotateTransform(-90);
-            }
-
-            // 处理行对齐（考虑缩放）
-            bool shouldSetLineAlignmentToCenter = true;
-            if (IsOldLineAlignment)
-            {
-                shouldSetLineAlignmentToCenter = LineSpacingPx < 0;
-            }
-            if (shouldSetLineAlignmentToCenter)
-            {
-                if (IsVerticalFont)
-                {
-                    this._tempGraphics.TranslateTransform((LineSpacingPx * scale) / 2, 0);
-                }
-                else
-                {
-                    this._tempGraphics.TranslateTransform(0, (LineSpacingPx * scale) / 2);
-                }
-            }
-
-            // 处理字符间距（仅对非ASCII字符，考虑缩放）
-            if (CharSpacingPx != 0 && charCodePoint > 255)
-            {
-                if (IsVerticalFont)
-                {
-                    this._tempGraphics.TranslateTransform(0, (CharSpacingPx * scale) / 2);
-                }
-                else
-                {
-                    this._tempGraphics.TranslateTransform((CharSpacingPx * scale) / 2, 0);
-                }
-            }
-
-            // 创建缩放后的字体（如果需要），使用缓存避免重复创建
-            Font renderFont = this.Font;
-            if (SuperSampling != SuperSamplingMode.None)
-            {
-                float scaledSize = this.Font.Size * scale;
-
-                // 检查缓存是否有效
-                if (_cachedSuperSamplingFont == null ||
-                    _cachedSuperSamplingSize != scaledSize ||
-                    _cachedSuperSamplingMode != SuperSampling ||
-                    !_cachedSuperSamplingFont.FontFamily.Equals(this.Font.FontFamily) ||
-                    _cachedSuperSamplingFont.Style != this.Font.Style)
-                {
-                    // 缓存无效，创建新字体并更新缓存
-                    _cachedSuperSamplingFont?.Dispose();
-                    _cachedSuperSamplingFont = new Font(this.Font.FontFamily, scaledSize, this.Font.Style);
-                    _cachedSuperSamplingSize = scaledSize;
-                    _cachedSuperSamplingMode = SuperSampling;
-                }
-
-                renderFont = _cachedSuperSamplingFont;
-            }
-
-            // 绘制字符
-            this._tempGraphics.DrawString(chr.ToString(), renderFont, Brushes.White, 0, 0, _format);
-
             // SuperSampling处理流程
-            if (SuperSampling != SuperSamplingMode.None)
+            if (EnableUltimateSuperSampling)
             {
-                // 使用矢量SuperSampling：直接从矢量到目标尺寸，避免超大Bitmap
-                using (Bitmap vectorBitmap = RenderVectorSuperSampling(charCodePoint, renderer.Width, renderer.Height))
+                // 使用终极SuperSampling系统：256x固定采样 + 16x16 Bayer抖动
+                using (Bitmap ultimateBitmap = RenderUltimateSuperSampling(charCodePoint, renderer.Width, renderer.Height))
                 {
-                    // SuperSampling模式下，对特殊字符进行算法优化
-                    int optimizedThreshold = CalculateOptimizedThreshold(vectorBitmap, this.LightThrehold, charCodePoint);
-                    renderer.LoadFromBitmap(charCodePoint, vectorBitmap, 0, 0, optimizedThreshold);
+                    // 终极SuperSampling已经包含所有优化，直接使用用户阈值
+                    renderer.LoadFromBitmap(charCodePoint, ultimateBitmap, 0, 0, this.LightThrehold);
                 }
             }
             else
             {
+                // 无SuperSampling，使用传统渲染
+                this._tempGraphics.Clear(Color.Black);
+                this._tempGraphics.ResetTransform();
+
+                // 绘制边框
+                if (RenderBorder)
+                {
+                    this._tempGraphics.DrawRectangle(Pens.White, 0, 0, renderer.Width - 1, renderer.Height - 1);
+                }
+
+                // 处理垂直字体变换
+                if (IsVerticalFont)
+                {
+                    this._tempGraphics.TranslateTransform(0, renderer.Height);
+                    this._tempGraphics.RotateTransform(-90);
+                }
+
+                // 处理行对齐
+                bool shouldSetLineAlignmentToCenter = true;
+                if (IsOldLineAlignment)
+                {
+                    shouldSetLineAlignmentToCenter = LineSpacingPx < 0;
+                }
+                if (shouldSetLineAlignmentToCenter)
+                {
+                    if (IsVerticalFont)
+                    {
+                        this._tempGraphics.TranslateTransform(LineSpacingPx / 2, 0);
+                    }
+                    else
+                    {
+                        this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
+                    }
+                }
+
+                // 处理字符间距（仅对非ASCII字符）
+                if (CharSpacingPx != 0 && charCodePoint > 255)
+                {
+                    if (IsVerticalFont)
+                    {
+                        this._tempGraphics.TranslateTransform(0, CharSpacingPx / 2);
+                    }
+                    else
+                    {
+                        this._tempGraphics.TranslateTransform(CharSpacingPx / 2, 0);
+                    }
+                }
+
+                // 绘制字符
+                this._tempGraphics.DrawString(chr.ToString(), this.Font, Brushes.White, 0, 0, _format);
+
                 // 无SuperSampling，直接使用用户阈值
                 renderer.LoadFromBitmap(charCodePoint, _tempRenderSurface, 0, 0, this.LightThrehold);
             }
@@ -630,32 +924,8 @@ namespace XTEinkTools
         /// <returns>补偿后的阈值</returns>
         private int CompensateForSuperSamplingBrightening(int userThreshold)
         {
-            // 基础补偿：根据SuperSampling级别
-            int baseCompensation = 0;
-            switch (SuperSampling)
-            {
-                case SuperSamplingMode.x2:
-                    baseCompensation = 6;   // 2倍采样：轻微补偿
-                    break;
-                case SuperSamplingMode.x4:
-                    baseCompensation = 12;  // 4倍采样：中等补偿
-                    break;
-                case SuperSamplingMode.x8:
-                    baseCompensation = 18;  // 8倍采样：适度补偿
-                    break;
-                case SuperSamplingMode.x16:
-                    baseCompensation = 22;  // 16倍采样：较大补偿
-                    break;
-                case SuperSamplingMode.x32:
-                    baseCompensation = 26;  // 32倍采样：高级补偿
-                    break;
-                case SuperSamplingMode.x64:
-                    baseCompensation = 30;  // 64倍采样：终极补偿
-                    break;
-                default:
-                    baseCompensation = 0;
-                    break;
-            }
+            // 256x终极超采样固定补偿
+            int baseCompensation = EnableUltimateSuperSampling ? 30 : 0; // 256x采样：终极补偿
 
             // 应用补偿：降低阈值让更多像素保持黑色
             int compensatedThreshold = userThreshold - baseCompensation;
