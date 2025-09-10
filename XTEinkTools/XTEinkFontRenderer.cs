@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Runtime.Versioning;
 
 namespace XTEinkTools
-{
+    // 注意：SuperSampling现在使用bool控制，true=256x终极超采样，false=无超采样
     public class XTEinkFontRenderer : IDisposable
     {
         public enum AntiAltasMode
@@ -157,11 +157,9 @@ namespace XTEinkTools
 
                 using GraphicsPath gp = new();
                 float emSizeInPoints = Font.SizeInPoints;
-                float pixelSize = emSizeInPoints * 96f / 72f;   // pt→px
-                float superPixelSize = pixelSize * ULTRA_SCALE;
 
                 gp.AddString(chr.ToString(), Font.FontFamily, (int)Font.Style,
-                             superPixelSize, PointF.Empty, StringFormat.GenericTypographic);
+                             emSizeInPoints, PointF.Empty, StringFormat.GenericTypographic);
 
                 using Matrix m = new();
                 // 先应用字体变换（垂直、间距等）
