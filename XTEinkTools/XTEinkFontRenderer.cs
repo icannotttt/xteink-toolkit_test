@@ -291,7 +291,7 @@ namespace XTEinkTools
                 using (Bitmap scaledBitmap = ApplySuperSampling(_tempRenderSurface, renderer.Width, renderer.Height))
                 {
                     // SuperSampling模式使用优化的阈值策略，保留更多灰度细节
-                    int optimizedThreshold = CalculateOptimizedThreshold(scaledBitmap, this.LightThrehold);
+                    int optimizedThreshold = CalculateOptimizedThreshold(scaledBitmap, this.LightThrehold, charCodePoint);
                     renderer.LoadFromBitmap(charCodePoint, scaledBitmap, 0, 0, optimizedThreshold);
                 }
 
@@ -310,15 +310,19 @@ namespace XTEinkTools
 
         /// <summary>
         /// 为SuperSampling模式计算优化的二值化阈值
-        /// 分析图像特征，保留更多抗锯齿细节
+        /// 分析图像特征，保留更多抗锯齿细节，对标点符号特殊处理
         /// </summary>
         /// <param name="bitmap">SuperSampling处理后的位图</param>
         /// <param name="userThreshold">用户设置的原始阈值</param>
+        /// <param name="charCodePoint">当前字符的Unicode码点</param>
         /// <returns>优化后的阈值</returns>
-        private int CalculateOptimizedThreshold(Bitmap bitmap, int userThreshold)
+        private int CalculateOptimizedThreshold(Bitmap bitmap, int userThreshold, int charCodePoint)
         {
             try
             {
+                // 检查是否为标点符号
+                bool isPunctuation = IsPunctuationCharacter(charCodePoint);
+
                 // 分析图像像素分布
                 var histogram = new int[256];
                 int totalPixels = bitmap.Width * bitmap.Height;
@@ -349,12 +353,22 @@ namespace XTEinkTools
                     return userThreshold;
                 }
 
-                // 使用改进的Otsu算法，但考虑用户偏好
+                // 标点符号使用保守的阈值策略，避免模糊
+                if (isPunctuation)
+                {
+                    // 对标点符号，主要使用用户阈值，稍微调整以保持清晰
+                    int scale = (int)SuperSampling;
+                    // 标点符号倾向于使用更高的阈值来保持锐利
+                    int conservativeThreshold = userThreshold + (scale - 1) * 5;
+                    return Math.Min(200, Math.Max(userThreshold, conservativeThreshold));
+                }
+
+                // 对普通文字字符使用改进的Otsu算法
                 int otsuThreshold = CalculateOtsuThreshold(histogram, totalPixels);
 
                 // 根据SuperSampling级别调整策略
-                int scale = (int)SuperSampling;
-                double adjustmentFactor = 1.0 - (scale - 1) * 0.1; // 高倍SuperSampling使用更低阈值保留细节
+                int scale2 = (int)SuperSampling;
+                double adjustmentFactor = 1.0 - (scale2 - 1) * 0.1; // 高倍SuperSampling使用更低阈值保留细节
 
                 // 混合用户阈值和Otsu阈值，倾向于保留更多细节
                 int optimizedThreshold = (int)(otsuThreshold * adjustmentFactor * 0.7 + userThreshold * 0.3);
@@ -366,6 +380,42 @@ namespace XTEinkTools
             {
                 // 如果计算失败，回退到用户阈值
                 return userThreshold;
+            }
+        }
+
+        /// <summary>
+        /// 判断字符是否为标点符号
+        /// </summary>
+        /// <param name="charCodePoint">字符的Unicode码点</param>
+        /// <returns>是否为标点符号</returns>
+        private bool IsPunctuationCharacter(int charCodePoint)
+        {
+            // ASCII标点符号
+            if ((charCodePoint >= 0x0020 && charCodePoint <= 0x002F) ||  // 空格和基本标点
+                (charCodePoint >= 0x003A && charCodePoint <= 0x0040) ||  // :;<=>?@
+                (charCodePoint >= 0x005B && charCodePoint <= 0x0060) ||  // [\]^_`
+                (charCodePoint >= 0x007B && charCodePoint <= 0x007E))    // {|}~
+            {
+                return true;
+            }
+
+            // 常用Unicode标点符号范围
+            if ((charCodePoint >= 0x2000 && charCodePoint <= 0x206F) ||  // 通用标点
+                (charCodePoint >= 0x3000 && charCodePoint <= 0x303F) ||  // CJK标点
+                (charCodePoint >= 0xFF00 && charCodePoint <= 0xFFEF))    // 全角标点
+            {
+                return true;
+            }
+
+            // 使用.NET内置的标点判断作为补充
+            try
+            {
+                char ch = (char)charCodePoint;
+                return char.IsPunctuation(ch) || char.IsSymbol(ch);
+            }
+            catch
+            {
+                return false;
             }
         }
 
