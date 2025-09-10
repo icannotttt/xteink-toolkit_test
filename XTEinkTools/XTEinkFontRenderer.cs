@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -163,24 +163,13 @@ namespace XTEinkTools
                 using (Graphics g = Graphics.FromImage(targetBitmap))
                 {
                     // ===== 2. 超采样后：缩图回目标尺寸 ==============================
-
-                    // 智能选择插值算法：根据字符特性平衡锐利度和平滑度
-                    bool needsSmoothCurves = NeedsSmoothCurveProcessing(charCodePoint);
-
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
                     g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                     g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half; // 避免半像素偏移
 
-                    if (needsSmoothCurves)
-                    {
-                        // 包含曲线的字符：使用Bilinear保持曲线平滑，避免变形
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-                    }
-                    else
-                    {
-                        // 简单字符：使用NearestNeighbor保持最大锐利度
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                    }
+                    // 统一使用HighQualityBilinear保证亮度一致性
+                    // 虽然可能牺牲部分锐利度，但优先保证字符间亮度统一
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
                     g.DrawImage(sourceBitmap,
                         new Rectangle(0, 0, targetWidth, targetHeight),
                         new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height),
@@ -388,33 +377,9 @@ namespace XTEinkTools
                     return userThreshold;
                 }
 
-                // 统一亮度处理：所有字符都使用相同的基础补偿策略
-                int baseCompensatedThreshold = CompensateForSuperSamplingBrightening(userThreshold);
-
-                // 根据字符类型进行微调，但保持整体亮度一致
-                if (isPunctuation)
-                {
-                    // 标点符号：轻微锐化，但不大幅改变亮度
-                    return Math.Max(baseCompensatedThreshold - 5, Math.Min(baseCompensatedThreshold + 5, baseCompensatedThreshold));
-                }
-                else if (isComplexCharacter)
-                {
-                    // 复杂字符：使用Otsu算法优化，但限制在合理范围内
-                    int otsuThreshold = CalculateOtsuThreshold(histogram, totalPixels);
-
-                    // 将Otsu结果限制在用户阈值的合理范围内，避免过大差异
-                    int clampedOtsu = Math.Max(baseCompensatedThreshold - 15,
-                                              Math.Min(baseCompensatedThreshold + 15, otsuThreshold));
-
-                    // 混合用户阈值和Otsu结果，但偏向用户阈值保持一致性
-                    int complexThreshold = (int)(clampedOtsu * 0.3 + baseCompensatedThreshold * 0.7);
-                    return complexThreshold;
-                }
-                else
-                {
-                    // 普通字符：直接使用基础补偿阈值
-                    return baseCompensatedThreshold;
-                }
+                // 统一亮度处理：所有字符都使用完全相同的补偿策略，确保亮度一致性
+                int unifiedThreshold = CompensateForSuperSamplingBrightening(userThreshold);
+                return unifiedThreshold;
             }
             catch
             {

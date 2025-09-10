@@ -1,4 +1,4 @@
-﻿﻿namespace XTEinkToolkit
+﻿namespace XTEinkToolkit
 {
     partial class FrmMain
     {
