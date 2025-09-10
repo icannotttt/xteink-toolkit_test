@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Text;
@@ -137,6 +138,113 @@ namespace XTEinkTools
             this._tempGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic; // 最高质量插值
             this._tempGraphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
             // 注意：TextRenderingHint 通过 syncSettings() 根据用户AAMode动态设置
+        }
+
+        /// <summary>
+        /// 使用矢量路径进行SuperSampling渲染（高效方案）
+        /// 避免超大Bitmap和二次插值，直接从矢量到目标尺寸
+        /// </summary>
+        /// <param name="charCodePoint">字符码点</param>
+        /// <param name="targetWidth">目标宽度</param>
+        /// <param name="targetHeight">目标高度</param>
+        /// <returns>SuperSampling渲染后的位图</returns>
+        private Bitmap RenderVectorSuperSampling(int charCodePoint, int targetWidth, int targetHeight)
+        {
+            char chr = (char)charCodePoint;
+            int scale = (int)SuperSampling;
+
+            // 创建目标尺寸的位图（恒定内存占用）
+            Bitmap result = new Bitmap(targetWidth, targetHeight);
+            result.SetResolution(96, 96);
+
+            using (Graphics g = Graphics.FromImage(result))
+            {
+                g.Clear(Color.Black);
+
+                // 设置高质量矢量渲染
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.CompositingQuality = CompositingQuality.HighQuality;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                // 处理边框
+                if (RenderBorder)
+                {
+                    g.DrawRectangle(Pens.White, 0, 0, targetWidth - 1, targetHeight - 1);
+                }
+
+                // 创建矢量路径
+                using (GraphicsPath gp = new GraphicsPath())
+                {
+                    // 将字符转换为矢量路径，使用SuperSampling倍数的字体大小
+                    float vectorFontSize = this.Font.SizeInPoints * scale;
+                    gp.AddString(chr.ToString(), this.Font.FontFamily, (int)this.Font.Style,
+                               vectorFontSize, PointF.Empty, StringFormat.GenericTypographic);
+
+                    // 创建变换矩阵：缩小到目标尺寸
+                    using (Matrix matrix = new Matrix(1.0f / scale, 0, 0, 1.0f / scale, 0, 0))
+                    {
+                        // 应用坐标变换处理
+                        ApplyVectorTransforms(matrix, targetWidth, targetHeight, scale, charCodePoint);
+
+                        // 应用变换到路径
+                        gp.Transform(matrix);
+
+                        // 填充矢量路径到位图
+                        g.FillPath(Brushes.White, gp);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 应用矢量变换（垂直字体、间距、对齐等）
+        /// </summary>
+        /// <param name="matrix">变换矩阵</param>
+        /// <param name="targetWidth">目标宽度</param>
+        /// <param name="targetHeight">目标高度</param>
+        /// <param name="scale">SuperSampling缩放比例</param>
+        /// <param name="charCodePoint">字符码点</param>
+        private void ApplyVectorTransforms(Matrix matrix, int targetWidth, int targetHeight, int scale, int charCodePoint)
+        {
+            // 处理垂直字体变换
+            if (IsVerticalFont)
+            {
+                matrix.Translate(0, targetHeight);
+                matrix.Rotate(-90);
+            }
+
+            // 处理行对齐
+            bool shouldSetLineAlignmentToCenter = true;
+            if (IsOldLineAlignment)
+            {
+                shouldSetLineAlignmentToCenter = LineSpacingPx < 0;
+            }
+            if (shouldSetLineAlignmentToCenter)
+            {
+                if (IsVerticalFont)
+                {
+                    matrix.Translate(LineSpacingPx / 2.0f, 0);
+                }
+                else
+                {
+                    matrix.Translate(0, LineSpacingPx / 2.0f);
+                }
+            }
+
+            // 处理字符间距（仅对非ASCII字符）
+            if (CharSpacingPx != 0 && (char)charCodePoint > 255)
+            {
+                if (IsVerticalFont)
+                {
+                    matrix.Translate(0, CharSpacingPx / 2.0f);
+                }
+                else
+                {
+                    matrix.Translate(CharSpacingPx / 2.0f, 0);
+                }
+            }
         }
 
         /// <summary>
@@ -306,11 +414,12 @@ namespace XTEinkTools
             // SuperSampling处理流程
             if (SuperSampling != SuperSamplingMode.None)
             {
-                using (Bitmap scaledBitmap = ApplySuperSampling(_tempRenderSurface, renderer.Width, renderer.Height, charCodePoint))
+                // 使用矢量SuperSampling：直接从矢量到目标尺寸，避免超大Bitmap
+                using (Bitmap vectorBitmap = RenderVectorSuperSampling(charCodePoint, renderer.Width, renderer.Height))
                 {
                     // SuperSampling模式下，对特殊字符进行算法优化
-                    int optimizedThreshold = CalculateOptimizedThreshold(scaledBitmap, this.LightThrehold, charCodePoint);
-                    renderer.LoadFromBitmap(charCodePoint, scaledBitmap, 0, 0, optimizedThreshold);
+                    int optimizedThreshold = CalculateOptimizedThreshold(vectorBitmap, this.LightThrehold, charCodePoint);
+                    renderer.LoadFromBitmap(charCodePoint, vectorBitmap, 0, 0, optimizedThreshold);
                 }
             }
             else
