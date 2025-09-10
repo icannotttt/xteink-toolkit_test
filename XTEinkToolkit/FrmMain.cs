@@ -71,7 +71,7 @@ namespace XTEinkToolkit
             chkSuperSampling.Checked = false;
 
             // 设置工具提示
-            toolTip1.SetToolTip(chkSuperSampling, "启用256x终极超采样，实现激光打印级字体质量，但会增加处理时间");
+            toolTip1.SetToolTip(chkSuperSampling, "启用326x超采样");
         }
 
 
