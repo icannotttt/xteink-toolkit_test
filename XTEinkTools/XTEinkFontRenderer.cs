@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Runtime.Versioning;
 
 namespace XTEinkTools
+{
     // 注意：SuperSampling现在使用bool控制，true=256x终极超采样，false=无超采样
     public class XTEinkFontRenderer : IDisposable
     {
