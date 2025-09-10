@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -8,6 +8,17 @@ using System.Threading.Tasks;
 
 namespace XTEinkTools
 {
+    /// <summary>
+    /// 超采样模式
+    /// </summary>
+    public enum SuperSamplingMode
+    {
+        None = 1,        // 无超采样
+        x2 = 2,          // 2倍超采样
+        x4 = 4,          // 4倍超采样
+        x8 = 8           // 8倍超采样（高质量模式）
+    }
+
     /// <summary>
     /// 字形渲染器
     /// </summary>
@@ -31,6 +42,11 @@ namespace XTEinkTools
         public Font Font { get; set; } = SystemFonts.DefaultFont;
         public bool IsOldLineAlignment { get; set; }
         public bool RenderBorder { get; set; }
+
+        /// <summary>
+        /// 超采样模式，默认为None（无超采样）
+        /// </summary>
+        public SuperSamplingMode SuperSampling { get; set; } = SuperSamplingMode.None;
 
         private Bitmap _tempRenderSurface;
         private Graphics _tempGraphics;
@@ -74,9 +90,19 @@ namespace XTEinkTools
 
         private void ensureRenderSurfaceSize(int width,int height)
         {
+            // 计算SuperSampling所需的实际尺寸
+            int actualWidth = width;
+            int actualHeight = height;
+
+            if (SuperSampling != SuperSamplingMode.None)
+            {
+                int scale = (int)SuperSampling;
+                actualWidth = width * scale;
+                actualHeight = height * scale;
+            }
 
             if (this._tempRenderSurface != null && this._tempGraphics != null) {
-                if (this._tempRenderSurface.Width == width && this._tempRenderSurface.Height == height)
+                if (this._tempRenderSurface.Width == actualWidth && this._tempRenderSurface.Height == actualHeight)
                 {
                     return;
                 }
@@ -92,12 +118,68 @@ namespace XTEinkTools
                 this._tempRenderSurface?.Dispose();
             }catch { }
 
-            this._tempRenderSurface = new Bitmap(width, height);
+            this._tempRenderSurface = new Bitmap(actualWidth, actualHeight);
             this._tempRenderSurface.SetResolution(96, 96);
             this._tempGraphics = Graphics.FromImage(this._tempRenderSurface);
             this._tempGraphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
-            this._tempGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.GammaCorrected;
+
+            // SuperSampling模式下使用高质量渲染选项
+            if (SuperSampling != SuperSamplingMode.None)
+            {
+                this._tempGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                this._tempGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                this._tempGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                this._tempGraphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+            }
+            else
+            {
+                this._tempGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.GammaCorrected;
+            }
             this._tempGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+        }
+
+        /// <summary>
+        /// 应用SuperSampling缩放处理
+        /// </summary>
+        /// <param name="sourceBitmap">源位图</param>
+        /// <param name="targetWidth">目标宽度</param>
+        /// <param name="targetHeight">目标高度</param>
+        /// <returns>缩放后的位图</returns>
+        private Bitmap ApplySuperSampling(Bitmap sourceBitmap, int targetWidth, int targetHeight)
+        {
+            if (SuperSampling == SuperSamplingMode.None)
+            {
+                return sourceBitmap; // 无需处理，直接返回原图
+            }
+
+            try
+            {
+                // 创建目标尺寸的位图
+                Bitmap targetBitmap = new Bitmap(targetWidth, targetHeight);
+                targetBitmap.SetResolution(96, 96);
+
+                using (Graphics g = Graphics.FromImage(targetBitmap))
+                {
+                    // 设置高质量缩放选项
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+                    // 使用高质量算法缩放图像
+                    g.DrawImage(sourceBitmap,
+                        new Rectangle(0, 0, targetWidth, targetHeight),
+                        new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height),
+                        GraphicsUnit.Pixel);
+                }
+
+                return targetBitmap;
+            }
+            catch
+            {
+                // 如果SuperSampling失败，则返回原图
+                return sourceBitmap;
+            }
         }
 
         private void syncSettings()
@@ -132,22 +214,31 @@ namespace XTEinkTools
             ensureRenderSurfaceSize(renderer.Width, renderer.Height);
             syncSettings();
             char chr = (char)charCodePoint;
-            this._tempGraphics.Clear(Color.Black);
 
+            // 计算SuperSampling缩放比例
+            int scale = (int)SuperSampling;
+
+            // 清空画布
+            this._tempGraphics.Clear(Color.Black);
             this._tempGraphics.ResetTransform();
+
+            // 绘制边框（考虑缩放）
             if (RenderBorder)
             {
-                this._tempGraphics.DrawRectangle(Pens.White, 0, 0, renderer.Width - 1, renderer.Height - 1);
+                int borderWidth = (renderer.Width * scale) - 1;
+                int borderHeight = (renderer.Height * scale) - 1;
+                this._tempGraphics.DrawRectangle(Pens.White, 0, 0, borderWidth, borderHeight);
             }
+
+            // 处理垂直字体变换（考虑缩放）
             if (IsVerticalFont)
             {
-                this._tempGraphics.TranslateTransform(0,renderer.Height);
+                this._tempGraphics.TranslateTransform(0, renderer.Height * scale);
                 this._tempGraphics.RotateTransform(-90);
             }
 
+            // 处理行对齐（考虑缩放）
             bool shouldSetLineAlignmentToCenter = true;
-
-
             if (IsOldLineAlignment)
             {
                 shouldSetLineAlignmentToCenter = LineSpacingPx < 0;
@@ -156,32 +247,57 @@ namespace XTEinkTools
             {
                 if (IsVerticalFont)
                 {
-
-                    this._tempGraphics.TranslateTransform(LineSpacingPx / 2, 0);
+                    this._tempGraphics.TranslateTransform((LineSpacingPx * scale) / 2, 0);
                 }
                 else
                 {
-
-                    this._tempGraphics.TranslateTransform(0, LineSpacingPx / 2);
+                    this._tempGraphics.TranslateTransform(0, (LineSpacingPx * scale) / 2);
                 }
             }
+
+            // 处理字符间距（仅对非ASCII字符，考虑缩放）
             if (CharSpacingPx != 0 && charCodePoint > 255)
             {
                 if (IsVerticalFont)
                 {
-
-                    this._tempGraphics.TranslateTransform(0, CharSpacingPx / 2);
+                    this._tempGraphics.TranslateTransform(0, (CharSpacingPx * scale) / 2);
                 }
                 else
                 {
-
-                    this._tempGraphics.TranslateTransform(CharSpacingPx / 2,0);
+                    this._tempGraphics.TranslateTransform((CharSpacingPx * scale) / 2, 0);
                 }
             }
 
-            this._tempGraphics.DrawString(chr.ToString(), this.Font, Brushes.White, 0,0, _format);
-            
-            renderer.LoadFromBitmap(charCodePoint, _tempRenderSurface, 0, 0, this.LightThrehold);
+            // 创建缩放后的字体（如果需要）
+            Font renderFont = this.Font;
+            if (SuperSampling != SuperSamplingMode.None)
+            {
+                float scaledSize = this.Font.Size * scale;
+                renderFont = new Font(this.Font.FontFamily, scaledSize, this.Font.Style);
+            }
+
+            // 绘制字符
+            this._tempGraphics.DrawString(chr.ToString(), renderFont, Brushes.White, 0, 0, _format);
+
+            // 应用SuperSampling处理
+            if (SuperSampling != SuperSamplingMode.None)
+            {
+                using (Bitmap scaledBitmap = ApplySuperSampling(_tempRenderSurface, renderer.Width, renderer.Height))
+                {
+                    renderer.LoadFromBitmap(charCodePoint, scaledBitmap, 0, 0, this.LightThrehold);
+                }
+
+                // 释放缩放字体资源
+                if (renderFont != this.Font)
+                {
+                    renderFont.Dispose();
+                }
+            }
+            else
+            {
+                // 无SuperSampling，使用原有逻辑
+                renderer.LoadFromBitmap(charCodePoint, _tempRenderSurface, 0, 0, this.LightThrehold);
+            }
         }
 
         void IDisposable.Dispose()

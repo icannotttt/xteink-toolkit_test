@@ -1,0 +1,24 @@
+name: Build XTEinkToolkit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+env:
+  PROJ: XTEinkToolkit/XTEinkToolkit.csproj
+  CONFIG: Release
+
+jobs:
+  build-toolkit:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - run: nuget restore XTEinkToolkit.sln          # ← 改这里
+      - run: msbuild ${{ env.PROJ }} /p:Configuration=${{ env.CONFIG }} /m
+      - uses: actions/upload-artifact@v4
+        with:
+          name: XTEinkToolkit
+          path: XTEinkToolkit/bin/${{ env.CONFIG }}/XTEinkToolkit.exe
+          retention-days: 7

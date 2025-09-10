@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿﻿﻿﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -760,7 +760,7 @@
     <value>panel4</value>
   </data>
   <data name="&gt;&gt;chkShowENCharacter.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>2</value>
   </data>
   <data name="radioButton1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -790,7 +790,7 @@
     <value>panel4</value>
   </data>
   <data name="&gt;&gt;radioButton1.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>3</value>
   </data>
   <data name="chkTraditionalChinese.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -820,7 +820,64 @@
     <value>panel4</value>
   </data>
   <data name="&gt;&gt;chkTraditionalChinese.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
+  </data>
+  <data name="lblSuperSampling.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lblSuperSampling.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lblSuperSampling.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 28</value>
+  </data>
+  <data name="lblSuperSampling.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 16</value>
+  </data>
+  <data name="lblSuperSampling.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="lblSuperSampling.Text" xml:space="preserve">
+    <value>超采样模式：</value>
+  </data>
+  <data name="&gt;&gt;lblSuperSampling.Name" xml:space="preserve">
+    <value>lblSuperSampling</value>
+  </data>
+  <data name="&gt;&gt;lblSuperSampling.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSuperSampling.Parent" xml:space="preserve">
+    <value>panel4</value>
+  </data>
+  <data name="&gt;&gt;lblSuperSampling.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="cmbSuperSampling.DropDownStyle" type="System.Windows.Forms.ComboBoxStyle, System.Windows.Forms">
+    <value>DropDownList</value>
+  </data>
+  <data name="cmbSuperSampling.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="cmbSuperSampling.Location" type="System.Drawing.Point, System.Drawing">
+    <value>90, 25</value>
+  </data>
+  <data name="cmbSuperSampling.Size" type="System.Drawing.Size, System.Drawing">
+    <value>120, 22</value>
+  </data>
+  <data name="cmbSuperSampling.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;cmbSuperSampling.Name" xml:space="preserve">
+    <value>cmbSuperSampling</value>
+  </data>
+  <data name="&gt;&gt;cmbSuperSampling.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cmbSuperSampling.Parent" xml:space="preserve">
+    <value>panel4</value>
+  </data>
+  <data name="&gt;&gt;cmbSuperSampling.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="lblPreviewMessage.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
