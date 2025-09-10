@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -169,10 +169,11 @@ namespace XTEinkTools
                 float subOffset = -0.125f;
                 m.Translate(subOffset, subOffset, MatrixOrder.Append);
 
+                gp.Transform(m);
+
                 if (ShouldApplyInkCompensation(charCodePoint))
                     ApplyInkExpansionCompensation(gp, 0.05f * ULTRA_SCALE); // 0.05 mm
 
-                gp.Transform(m);
                 g.FillPath(Brushes.White, gp);
             }
 
