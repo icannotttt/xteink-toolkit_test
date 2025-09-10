@@ -145,8 +145,9 @@ namespace XTEinkTools
         /// <param name="sourceBitmap">源位图</param>
         /// <param name="targetWidth">目标宽度</param>
         /// <param name="targetHeight">目标高度</param>
+        /// <param name="charCodePoint">字符码点，用于选择最佳插值算法</param>
         /// <returns>缩放后的位图</returns>
-        private Bitmap ApplySuperSampling(Bitmap sourceBitmap, int targetWidth, int targetHeight)
+        private Bitmap ApplySuperSampling(Bitmap sourceBitmap, int targetWidth, int targetHeight, int charCodePoint)
         {
             if (SuperSampling == SuperSamplingMode.None)
             {
@@ -162,12 +163,24 @@ namespace XTEinkTools
                 using (Graphics g = Graphics.FromImage(targetBitmap))
                 {
                     // ===== 2. 超采样后：缩图回目标尺寸 ==============================
+
+                    // 智能选择插值算法：根据字符特性平衡锐利度和平滑度
+                    bool needsSmoothCurves = NeedsSmoothCurveProcessing(charCodePoint);
+
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor; // 最邻域=最锐利
                     g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                     g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half; // 避免半像素偏移
 
-                    // 使用NearestNeighbor保持最大锐利度，最小化亮度损失
+                    if (needsSmoothCurves)
+                    {
+                        // 包含曲线的字符：使用Bilinear保持曲线平滑，避免变形
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+                    }
+                    else
+                    {
+                        // 简单字符：使用NearestNeighbor保持最大锐利度
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    }
                     g.DrawImage(sourceBitmap,
                         new Rectangle(0, 0, targetWidth, targetHeight),
                         new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height),
@@ -301,7 +314,7 @@ namespace XTEinkTools
             // SuperSampling处理流程
             if (SuperSampling != SuperSamplingMode.None)
             {
-                using (Bitmap scaledBitmap = ApplySuperSampling(_tempRenderSurface, renderer.Width, renderer.Height))
+                using (Bitmap scaledBitmap = ApplySuperSampling(_tempRenderSurface, renderer.Width, renderer.Height, charCodePoint))
                 {
                     // SuperSampling模式下，对特殊字符进行算法优化
                     int optimizedThreshold = CalculateOptimizedThreshold(scaledBitmap, this.LightThrehold, charCodePoint);
@@ -570,6 +583,92 @@ namespace XTEinkTools
             compensatedThreshold = Math.Min(240, compensatedThreshold);
 
             return compensatedThreshold;
+        }
+
+        /// <summary>
+        /// 判断字符是否需要平滑曲线处理
+        /// 包含弯钩、撇捺、圆弧等曲线笔画的字符需要使用Bilinear插值避免变形
+        /// </summary>
+        /// <param name="charCodePoint">字符的Unicode码点</param>
+        /// <returns>是否需要平滑曲线处理</returns>
+        private bool NeedsSmoothCurveProcessing(int charCodePoint)
+        {
+            // ASCII字符中包含曲线的字符
+            if (charCodePoint <= 127)
+            {
+                char ch = (char)charCodePoint;
+                // 包含曲线的英文字母和数字
+                if ("036689BCDGJOPQRSabcdegopqsuy".Contains(ch))
+                    return true;
+                // 包含曲线的标点符号
+                if ("()[]{}@&".Contains(ch))
+                    return true;
+                return false;
+            }
+
+            // 中文字符中常见的包含明显曲线笔画的字符
+            int[] curveChars = {
+                // 常见的包含弯钩的字符
+                0x4F60, // 你 - 竖弯钩
+                0x6211, // 我 - 斜钩
+                0x4E86, // 了 - 亅钩
+                0x5728, // 在 - 横折钩
+                0x4E0D, // 不 - 竖钩
+                0x53EF, // 可 - 竖钩
+                0x662F, // 是 - 竖弯钩
+                0x8FD9, // 这 - 竖弯钩
+                0x90A3, // 那 - 竖弯钩
+                0x5C31, // 就 - 横折钩
+                0x53BB, // 去 - 横钩
+                0x6CA1, // 没 - 竖弯钩
+                0x8BF4, // 说 - 竖弯钩
+
+                // 包含撇捺等曲线的字符
+                0x4EBA, // 人 - 撇捺
+                0x5929, // 天 - 撇捺
+                0x5927, // 大 - 撇捺
+                0x592A, // 太 - 撇捺
+                0x5C0F, // 小 - 撇点
+                0x6587, // 文 - 撇点
+                0x529B, // 力 - 横折钩
+                0x4E5D, // 九 - 横折弯钩
+                0x4E38, // 丸 - 横折钩
+
+                // 包含圆弧或曲线较多的字符
+                0x56FD, // 国 - 内含曲线
+                0x56DE, // 回 - 内含曲线
+                0x56E0, // 因 - 内含曲线
+                0x5706, // 圆 - 明显曲线
+                0x5708, // 圈 - 明显曲线
+                0x7403, // 球 - 包含曲线部分
+            };
+
+            // 检查是否为已知包含曲线的字符
+            for (int i = 0; i < curveChars.Length; i++)
+            {
+                if (charCodePoint == curveChars[i])
+                    return true;
+            }
+
+            // 对于其他中文字符，使用笔画特征判断
+            if (charCodePoint >= 0x4E00 && charCodePoint <= 0x9FFF) // CJK统一汉字
+            {
+                // 对于复杂字符，倾向于使用平滑处理
+                if (IsComplexCharacter(charCodePoint))
+                    return true;
+
+                // 默认情况下，中文字符可能包含曲线，使用保守策略
+                // 但为了保持性能，只对常见的弯钩字符特殊处理
+                return false;
+            }
+
+            // 其他Unicode字符（如全角标点）可能也需要平滑处理
+            if (charCodePoint >= 0xFF00 && charCodePoint <= 0xFFEF) // 全角字符
+            {
+                return true; // 全角字符通常需要平滑处理
+            }
+
+            return false;
         }
 
         void IDisposable.Dispose()
