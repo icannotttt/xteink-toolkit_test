@@ -526,22 +526,22 @@ namespace XTEinkTools
             switch (SuperSampling)
             {
                 case SuperSamplingMode.x2:
-                    baseCompensation = 12;  // 2倍采样：轻微补偿
+                    baseCompensation = 6;   // 2倍采样：轻微补偿
                     break;
                 case SuperSamplingMode.x4:
-                    baseCompensation = 20;  // 4倍采样：中等补偿
+                    baseCompensation = 12;  // 4倍采样：中等补偿
                     break;
                 case SuperSamplingMode.x8:
-                    baseCompensation = 28;  // 8倍采样：较大补偿
+                    baseCompensation = 18;  // 8倍采样：适度补偿
                     break;
                 case SuperSamplingMode.x16:
-                    baseCompensation = 35;  // 16倍采样：超高补偿
+                    baseCompensation = 22;  // 16倍采样：较大补偿
                     break;
                 case SuperSamplingMode.x32:
-                    baseCompensation = 42;  // 32倍采样：极致补偿
+                    baseCompensation = 26;  // 32倍采样：高级补偿
                     break;
                 case SuperSamplingMode.x64:
-                    baseCompensation = 48;  // 64倍采样：终极补偿
+                    baseCompensation = 30;  // 64倍采样：终极补偿
                     break;
                 default:
                     baseCompensation = 0;
