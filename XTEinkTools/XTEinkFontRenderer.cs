@@ -305,7 +305,7 @@ namespace XTEinkTools
             catch { /* 太细失败就原样 */ }
         }
 
-        private static void ApplyUltraVectorTransforms(Matrix m, int targetW, int targetH, int scale, int charCodePoint)
+        private void ApplyUltraVectorTransforms(Matrix m, int targetW, int targetH, int scale, int charCodePoint)
         {
             char chr = (char)charCodePoint;
             if (chr > 255 && char.IsControl(chr)) return;
@@ -332,7 +332,7 @@ namespace XTEinkTools
             }
         }
 
-        private static bool ShouldApplyInkCompensation(int charCodePoint)
+        private bool ShouldApplyInkCompensation(int charCodePoint)
         {
             if (charCodePoint <= 127)
             {
@@ -342,7 +342,7 @@ namespace XTEinkTools
             return !IsPunctuationCharacter(charCodePoint);
         }
 
-        private static bool IsPunctuationCharacter(int charCodePoint)
+        private bool IsPunctuationCharacter(int charCodePoint)
         {
             if (charCodePoint is >= 0x21 and <= 0x2F or >= 0x3A and <= 0x40 or >= 0x5B and <= 0x60 or >= 0x7B and <= 0x7E) return true;
             if (charCodePoint is >= 0x2000 and <= 0x206F or >= 0x3000 and <= 0x303F or >= 0xFF00 and <= 0xFFEF) return true;
