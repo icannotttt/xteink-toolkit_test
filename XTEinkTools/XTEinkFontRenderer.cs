@@ -51,9 +51,9 @@ namespace XTEinkTools
         /// <summary>
         /// SuperSampling模式下用户阈值的权重，范围0.0-1.0
         /// 值越高越接近用户设置，值越低越依赖自动算法
-        /// 默认0.3，表示用户阈值占70%权重
+        /// 默认0.7，表示用户阈值占70%权重
         /// </summary>
-        public double SuperSamplingUserWeight { get; set; } = 0.3;
+        public double SuperSamplingUserWeight { get; set; } = 0.7;
 
         private Bitmap _tempRenderSurface;
         private Graphics _tempGraphics;
