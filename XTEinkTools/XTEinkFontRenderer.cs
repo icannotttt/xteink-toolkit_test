@@ -164,12 +164,12 @@ namespace XTEinkTools
                 using (Graphics g = Graphics.FromImage(targetBitmap))
                 {
                     // 设置专门针对文字优化的缩放选项
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                     g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                     g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
-                    // 使用适合文字的缩放算法
+                    // 使用Bicubic算法更好地保留字体曲线和抗锯齿细节
                     g.DrawImage(sourceBitmap,
                         new Rectangle(0, 0, targetWidth, targetHeight),
                         new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height),
@@ -190,7 +190,7 @@ namespace XTEinkTools
             if (this._tempGraphics != null) {
                 TextRenderingHint targetHint = TextRenderingHint.SingleBitPerPixelGridFit;
 
-                // 始终按用户选择的抗锯齿模式设置，SuperSampling不干预此选择
+                // 始终按用户选择的抗锯齿模式设置，让用户完全控制渲染行为
                 switch (AAMode)
                 {
                     case AntiAltasMode.System1BitGridFit:
@@ -323,6 +323,7 @@ namespace XTEinkTools
                 var histogram = new int[256];
                 int totalPixels = bitmap.Width * bitmap.Height;
                 int nonBlackPixels = 0;
+                int uniqueGrayLevels = 0;
 
                 // 统计灰度分布
                 for (int y = 0; y < bitmap.Height; y++)
@@ -336,8 +337,14 @@ namespace XTEinkTools
                     }
                 }
 
-                // 如果图像主要是黑色（背景），使用用户阈值
-                if (nonBlackPixels < totalPixels * 0.1)
+                // 计算实际的灰度级别数量
+                for (int i = 0; i < 256; i++)
+                {
+                    if (histogram[i] > 0) uniqueGrayLevels++;
+                }
+
+                // 如果图像主要是黑色（背景），或者只有很少的灰度级别（可能是1bit模式），使用用户阈值
+                if (nonBlackPixels < totalPixels * 0.1 || uniqueGrayLevels < 8)
                 {
                     return userThreshold;
                 }
