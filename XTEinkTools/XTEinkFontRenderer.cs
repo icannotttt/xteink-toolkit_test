@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -107,7 +107,7 @@ namespace XTEinkTools
                     return;
                 }
             }
-            
+
             try
             {
                 this._tempGraphics?.Dispose();
@@ -123,19 +123,19 @@ namespace XTEinkTools
             this._tempGraphics = Graphics.FromImage(this._tempRenderSurface);
             this._tempGraphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
 
-            // SuperSampling模式下使用高质量渲染选项
+            // SuperSampling模式下使用专门优化的渲染选项
             if (SuperSampling != SuperSamplingMode.None)
             {
                 this._tempGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                this._tempGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                this._tempGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                this._tempGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                this._tempGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
                 this._tempGraphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
             }
             else
             {
                 this._tempGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.GammaCorrected;
+                this._tempGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
             }
-            this._tempGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
         }
 
         /// <summary>
@@ -160,13 +160,13 @@ namespace XTEinkTools
 
                 using (Graphics g = Graphics.FromImage(targetBitmap))
                 {
-                    // 设置高质量缩放选项
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    // 设置专门针对文字优化的缩放选项
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                     g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                     g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
-                    // 使用高质量算法缩放图像
+                    // 使用适合文字的缩放算法
                     g.DrawImage(sourceBitmap,
                         new Rectangle(0, 0, targetWidth, targetHeight),
                         new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height),
@@ -186,6 +186,8 @@ namespace XTEinkTools
         {
             if (this._tempGraphics != null) {
                 TextRenderingHint targetHint = TextRenderingHint.SingleBitPerPixelGridFit;
+
+                // 始终按用户选择的抗锯齿模式设置，SuperSampling不干预此选择
                 switch (AAMode)
                 {
                     case AntiAltasMode.System1BitGridFit:
@@ -197,6 +199,7 @@ namespace XTEinkTools
                     case AntiAltasMode.SystemAntiAltas:
                         targetHint = TextRenderingHint.AntiAlias; break;
                 }
+
                 if(this._tempGraphics.TextRenderingHint != targetHint)
                 {
                     this._tempGraphics.TextRenderingHint = targetHint;
