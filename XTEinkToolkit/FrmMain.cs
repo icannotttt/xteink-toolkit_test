@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -147,7 +147,7 @@ namespace XTEinkToolkit
                 "控制SuperSampling模式下的阈值策略：\n" +
                 "• 左侧：更多算法优化，自动调整每个字符\n" +
                 "• 右侧：更多用户控制，接近手动设置的阈值\n" +
-                "• 复杂字符（如"剪"字）会自动提高用户权重");
+                "• 复杂字符（如\"剪\"字）会自动提高用户权重");
             toolTip1.SetToolTip(lblUserWeight, "控制SuperSampling阈值策略的权重分配");
         }
 
