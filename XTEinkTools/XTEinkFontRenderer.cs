@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace XTEinkTools
 {
-    // 注意：SuperSampling现在使用bool控制，true=256x终极超采样，false=无超采样
+    // 注意：SuperSampling现在使用bool控制，true=32x终极超采样，false=无超采样
 
     /// <summary>
     /// 字形渲染器
@@ -36,7 +36,7 @@ namespace XTEinkTools
         public bool RenderBorder { get; set; }
 
         /// <summary>
-        /// 是否启用256x终极超采样，默认为false（无超采样）
+        /// 是否启用32x终极超采样，默认为false（无超采样）
         /// </summary>
         public bool EnableUltimateSuperSampling { get; set; } = false;
 
@@ -122,8 +122,8 @@ namespace XTEinkTools
         }
 
         /// <summary>
-        /// 终极SuperSampling渲染系统（256x + Bayer抖动 + Gamma校正）
-        /// 固定256x超采样，结合16x16 Bayer抖动，实现激光打印级质量
+        /// 终极SuperSampling渲染系统（32x + Bayer抖动 + Gamma校正）
+        /// 固定32x超采样，结合16x16 Bayer抖动，实现激光打印级质量
         /// </summary>
         /// <param name="charCodePoint">字符码点</param>
         /// <param name="targetWidth">目标宽度</param>
@@ -132,9 +132,9 @@ namespace XTEinkTools
         private Bitmap RenderUltimateSuperSampling(int charCodePoint, int targetWidth, int targetHeight)
         {
             char chr = (char)charCodePoint;
-            const int ULTRA_SCALE = 256; // 固定256x超超采样
+            const int ULTRA_SCALE = 32; // 32x超采样：内存友好，但仍保持高质量
 
-            // 第一步：创建256x超高分辨率灰度图
+            // 第一步：创建32x超高分辨率灰度图
             int ultraWidth = targetWidth * ULTRA_SCALE;
             int ultraHeight = targetHeight * ULTRA_SCALE;
 
@@ -200,7 +200,7 @@ namespace XTEinkTools
                 ApplyDirectionalSmoothing(ultraBitmap);
             }
 
-            // 第三步：256x灰度图 → 16x16 Bayer抖动 → 1-bit
+            // 第三步：32x灰度图 → 16x16 Bayer抖动 → 1-bit
             Bitmap result = ApplyBayerDithering(ultraBitmap, targetWidth, targetHeight, charCodePoint);
 
             ultraBitmap.Dispose();
@@ -230,14 +230,14 @@ namespace XTEinkTools
         };
 
         /// <summary>
-        /// 应用16x16 Bayer抖动（256x灰度 → 1-bit）
+        /// 应用16x16 Bayer抖动（32x灰度 → 1-bit）
         /// </summary>
         private Bitmap ApplyBayerDithering(Bitmap grayBitmap, int targetWidth, int targetHeight, int charCodePoint)
         {
             Bitmap result = new Bitmap(targetWidth, targetHeight);
             result.SetResolution(96, 96);
 
-            const int ULTRA_SCALE = 256;
+            const int ULTRA_SCALE = 32; // 与RenderUltimateSuperSampling保持一致
             bool isPunctuation = IsPunctuationCharacter(charCodePoint);
 
             // 计算线性光gamma校正的阈值
@@ -251,46 +251,60 @@ namespace XTEinkTools
             }
             double adjustedThresholdLinear = Math.Pow(adjustedThreshold / 255.0, 2.2);
 
-            using (Graphics g = Graphics.FromImage(result))
+            // 使用LockBits获取快速像素访问
+            var resultData = result.LockBits(new Rectangle(0, 0, targetWidth, targetHeight),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            try
             {
-                g.Clear(Color.Black);
-
-                for (int y = 0; y < targetHeight; y++)
+                unsafe
                 {
-                    for (int x = 0; x < targetWidth; x++)
+                    uint* resultPtr = (uint*)resultData.Scan0;
+                    int stride = resultData.Stride / 4;
+
+                    for (int y = 0; y < targetHeight; y++)
                     {
-                        // 从256x灰度图采样对应区域的平均灰度
-                        double avgGray = SampleUltraRegion(grayBitmap, x, y, ULTRA_SCALE);
+                        uint* row = resultPtr + y * stride;
 
-                        // 纯黑保护区：灰度<10直接为黑，不参与抖动
-                        if (avgGray < 10)
+                        for (int x = 0; x < targetWidth; x++)
                         {
-                            result.SetPixel(x, y, Color.Black);
-                            continue;
+                            // 从32x灰度图采样对应区域的平均灰度
+                            double avgGray = SampleUltraRegion(grayBitmap, x, y, ULTRA_SCALE);
+
+                            // 纯黑保护区：灰度<10直接为黑，不参与抖动
+                            if (avgGray < 10)
+                            {
+                                row[x] = 0xFF000000; // 黑色 ARGB
+                                continue;
+                            }
+
+                            // 线性光空间gamma校正阈值判断
+                            double grayLinear = Math.Pow(avgGray / 255.0, 2.2);
+
+                            // 16x16 Bayer抖动判断
+                            int bayerX = x % 16;
+                            int bayerY = y % 16;
+                            int bayerThreshold = BayerMatrix16x16[bayerY, bayerX];
+
+                            // 在线性光空间比较：灰度 vs (阈值 + Bayer扰动)
+                            double combinedThreshold = adjustedThresholdLinear + (bayerThreshold / 255.0 - 0.5) * 0.1;
+
+                            // 写入像素：白色或黑色
+                            row[x] = grayLinear > combinedThreshold ? 0xFFFFFFFF : 0xFF000000;
                         }
-
-                        // 线性光空间gamma校正阈值判断
-                        double grayLinear = Math.Pow(avgGray / 255.0, 2.2);
-
-                        // 16x16 Bayer抖动判断
-                        int bayerX = x % 16;
-                        int bayerY = y % 16;
-                        int bayerThreshold = BayerMatrix16x16[bayerY, bayerX];
-
-                        // 在线性光空间比较：灰度 vs (阈值 + Bayer扰动)
-                        double combinedThreshold = adjustedThresholdLinear + (bayerThreshold / 255.0 - 0.5) * 0.1;
-
-                        Color pixelColor = grayLinear > combinedThreshold ? Color.White : Color.Black;
-                        result.SetPixel(x, y, pixelColor);
                     }
                 }
+            }
+            finally
+            {
+                result.UnlockBits(resultData);
             }
 
             return result;
         }
 
         /// <summary>
-        /// 从256x灰度图采样指定区域的平均灰度
+        /// 从32x灰度图采样指定区域的平均灰度
         /// </summary>
         private double SampleUltraRegion(Bitmap ultraBitmap, int targetX, int targetY, int scale)
         {
@@ -317,12 +331,12 @@ namespace XTEinkTools
         }
 
         /// <summary>
-        /// 应用超高精度矢量变换（用于256x终极采样）
+        /// 应用超高精度矢量变换（用于32x终极采样）
         /// </summary>
         /// <param name="matrix">变换矩阵</param>
         /// <param name="targetWidth">目标宽度</param>
         /// <param name="targetHeight">目标高度</param>
-        /// <param name="ultraScale">超高精度缩放比例（固定256）</param>
+        /// <param name="ultraScale">超高精度缩放比例（固定32）</param>
         /// <param name="charCodePoint">字符码点</param>
         private void ApplyUltraVectorTransforms(Matrix matrix, int targetWidth, int targetHeight, int ultraScale, int charCodePoint)
         {
@@ -421,7 +435,7 @@ namespace XTEinkTools
         /// 应用方向敏感的平滑处理
         /// 对斜线/弯钩字符进行1x3/3x1高斯滤波
         /// </summary>
-        /// <param name="bitmap">要处理的256x超高分辨率位图</param>
+        /// <param name="bitmap">要处理的32x超高分辨率位图</param>
         private void ApplyDirectionalSmoothing(Bitmap bitmap)
         {
             try
@@ -658,7 +672,7 @@ namespace XTEinkTools
             // SuperSampling处理流程
             if (EnableUltimateSuperSampling)
             {
-                // 使用终极SuperSampling系统：256x固定采样 + 16x16 Bayer抖动
+                // 使用终极SuperSampling系统：32x固定采样 + 16x16 Bayer抖动
                 using (Bitmap ultimateBitmap = RenderUltimateSuperSampling(charCodePoint, renderer.Width, renderer.Height))
                 {
                     // 终极SuperSampling已经包含所有优化，直接使用用户阈值
@@ -924,8 +938,8 @@ namespace XTEinkTools
         /// <returns>补偿后的阈值</returns>
         private int CompensateForSuperSamplingBrightening(int userThreshold)
         {
-            // 256x终极超采样固定补偿
-            int baseCompensation = EnableUltimateSuperSampling ? 30 : 0; // 256x采样：终极补偿
+            // 32x终极超采样固定补偿
+            int baseCompensation = EnableUltimateSuperSampling ? 30 : 0; // 32x采样：终极补偿
 
             // 应用补偿：降低阈值让更多像素保持黑色
             int compensatedThreshold = userThreshold - baseCompensation;
