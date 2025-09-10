@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -388,32 +388,33 @@ namespace XTEinkTools
                     return userThreshold;
                 }
 
-                // 标点符号特殊处理：保持锐利清晰
+                // 统一亮度处理：所有字符都使用相同的基础补偿策略
+                int baseCompensatedThreshold = CompensateForSuperSamplingBrightening(userThreshold);
+
+                // 根据字符类型进行微调，但保持整体亮度一致
                 if (isPunctuation)
                 {
-                    int scale = (int)SuperSampling;
-                    // 标点符号使用稍微偏高的阈值，确保清晰锐利
-                    int punctuationThreshold = userThreshold + (scale - 1) * 8;
-                    return Math.Min(220, Math.Max(userThreshold, punctuationThreshold));
+                    // 标点符号：轻微锐化，但不大幅改变亮度
+                    return Math.Max(baseCompensatedThreshold - 5, Math.Min(baseCompensatedThreshold + 5, baseCompensatedThreshold));
                 }
-
-                // 复杂字符特殊处理：保留更多细节
-                if (isComplexCharacter)
+                else if (isComplexCharacter)
                 {
-                    // 对复杂字符使用Otsu算法，但偏向保留细节
+                    // 复杂字符：使用Otsu算法优化，但限制在合理范围内
                     int otsuThreshold = CalculateOtsuThreshold(histogram, totalPixels);
-                    int scale = (int)SuperSampling;
 
-                    // 复杂字符倾向于使用稍低的阈值来保留细节
-                    int complexThreshold = (int)(otsuThreshold * 0.85 + userThreshold * 0.15);
-                    complexThreshold -= (scale - 1) * 3; // SuperSampling级别越高，阈值稍微降低
+                    // 将Otsu结果限制在用户阈值的合理范围内，避免过大差异
+                    int clampedOtsu = Math.Max(baseCompensatedThreshold - 15,
+                                              Math.Min(baseCompensatedThreshold + 15, otsuThreshold));
 
-                    return Math.Max(32, Math.Min(200, complexThreshold));
+                    // 混合用户阈值和Otsu结果，但偏向用户阈值保持一致性
+                    int complexThreshold = (int)(clampedOtsu * 0.3 + baseCompensatedThreshold * 0.7);
+                    return complexThreshold;
                 }
-
-                // 普通字符：使用用户阈值，但补偿SuperSampling导致的亮度损失
-                int compensatedThreshold = CompensateForSuperSamplingBrightening(userThreshold);
-                return compensatedThreshold;
+                else
+                {
+                    // 普通字符：直接使用基础补偿阈值
+                    return baseCompensatedThreshold;
+                }
             }
             catch
             {
@@ -552,35 +553,29 @@ namespace XTEinkTools
         /// <returns>补偿后的阈值</returns>
         private int CompensateForSuperSamplingBrightening(int userThreshold)
         {
-            int scale = (int)SuperSampling;
-
-            // 根据SuperSampling级别计算补偿量
-            // 级别越高，亮度损失越明显，需要更多补偿
-            int compensation = 0;
+            // 基础补偿：根据SuperSampling级别
+            int baseCompensation = 0;
             switch (SuperSampling)
             {
                 case SuperSamplingMode.x2:
-                    compensation = 15;  // 2倍采样：轻微补偿
+                    baseCompensation = 12;  // 2倍采样：轻微补偿
                     break;
                 case SuperSamplingMode.x4:
-                    compensation = 25;  // 4倍采样：中等补偿
+                    baseCompensation = 20;  // 4倍采样：中等补偿
                     break;
                 case SuperSamplingMode.x8:
-                    compensation = 35;  // 8倍采样：较大补偿
+                    baseCompensation = 28;  // 8倍采样：较大补偿
                     break;
                 default:
-                    compensation = 0;
+                    baseCompensation = 0;
                     break;
             }
 
             // 应用补偿：降低阈值让更多像素保持黑色
-            int compensatedThreshold = userThreshold - compensation;
+            int compensatedThreshold = userThreshold - baseCompensation;
 
-            // 防止阈值过低导致过暗
-            compensatedThreshold = Math.Max(16, compensatedThreshold);
-
-            // 防止阈值过高导致过亮
-            compensatedThreshold = Math.Min(240, compensatedThreshold);
+            // 确保阈值在合理范围内
+            compensatedThreshold = Math.Max(20, Math.Min(235, compensatedThreshold));
 
             return compensatedThreshold;
         }
