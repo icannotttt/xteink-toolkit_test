@@ -32,6 +32,8 @@ namespace XTEinkTools
         public bool IsOldLineAlignment { get; set; }
         public bool RenderBorder { get; set; }
         public bool EnableUltimateSuperSampling { get; set; } = false;
+        public bool EnableSubPixelHinting { get; set; } = true;
+        public float SubPixelHintingStrength { get; set; } = 0.8f;
 
         #region private fields
         private Bitmap _tempRenderSurface;
@@ -268,6 +270,12 @@ namespace XTEinkTools
                 g.DrawString(chr.ToString(), scaledFont, Brushes.White, 0, 0, ultraFormat);
             }
 
+            // 应用子像素Hinting（如果启用）
+            if (EnableSubPixelHinting)
+            {
+                ultra = ApplySubPixelHinting(ultra, targetWidth, targetHeight, charCodePoint);
+            }
+
             var result = ApplyFloatPrecisionBayerDithering(ultra, targetWidth, targetHeight, charCodePoint);
             ReturnPooledBitmap(ultra);
             return result;
@@ -438,6 +446,279 @@ namespace XTEinkTools
                 result.UnlockBits(dstData);
             }
             return result;
+        }
+
+        private Bitmap ApplySubPixelHinting(Bitmap ultraBmp, int targetW, int targetH, int charCodePoint)
+        {
+            // 字符类型检测
+            var charType = GetCharacterType(charCodePoint);
+            if (charType == CharacterType.Detail) return ultraBmp; // 细节部分不处理
+
+            // 并行处理32×32块
+            int blockSize = ULTRA_SCALE;
+            var tasks = new List<Task>();
+
+            var data = ultraBmp.LockBits(new Rectangle(0, 0, ultraBmp.Width, ultraBmp.Height),
+                                        System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            try
+            {
+                unsafe
+                {
+                    uint* pixels = (uint*)data.Scan0;
+                    int stride = data.Stride / 4;
+
+                    // 并行处理每个目标像素对应的32×32块
+                    Parallel.For(0, targetH, y =>
+                    {
+                        for (int x = 0; x < targetW; x++)
+                        {
+                            ProcessPixelBlock(pixels, stride, x, y, blockSize, charType);
+                        }
+                    });
+                }
+            }
+            finally
+            {
+                ultraBmp.UnlockBits(data);
+            }
+
+            return ultraBmp;
+        }
+
+        private unsafe void ProcessPixelBlock(uint* pixels, int stride, int blockX, int blockY, int blockSize, CharacterType charType)
+        {
+            int startX = blockX * blockSize;
+            int startY = blockY * blockSize;
+
+            // 检测边缘方向和位置
+            var edgeInfo = DetectEdges(pixels, stride, startX, startY, blockSize);
+
+            if (edgeInfo.HasEdge)
+            {
+                // 根据字符类型应用不同强度的Hinting
+                float hintingStrength = charType switch
+                {
+                    CharacterType.StraightStroke => SubPixelHintingStrength,      // 直线笔画：强对齐
+                    CharacterType.CurvedStroke => SubPixelHintingStrength * 0.5f, // 曲线笔画：轻度对齐
+                    _ => 0f
+                };
+
+                if (hintingStrength > 0)
+                {
+                    ApplyEdgeAlignment(pixels, stride, startX, startY, blockSize, edgeInfo, hintingStrength);
+                }
+            }
+        }
+
+        private unsafe EdgeInfo DetectEdges(uint* pixels, int stride, int startX, int startY, int blockSize)
+        {
+            var edgeInfo = new EdgeInfo();
+
+            // 检测水平边缘
+            for (int y = 1; y < blockSize - 1; y++)
+            {
+                int whiteCount = 0;
+                float edgePosition = 0;
+                bool foundEdge = false;
+
+                for (int x = 0; x < blockSize; x++)
+                {
+                    uint pixel = pixels[(startY + y) * stride + (startX + x)];
+                    bool isWhite = (pixel & 0xFF) > 128;
+
+                    if (isWhite) whiteCount++;
+
+                    // 检测边缘过渡
+                    if (x > 0)
+                    {
+                        uint prevPixel = pixels[(startY + y) * stride + (startX + x - 1)];
+                        bool prevWhite = (prevPixel & 0xFF) > 128;
+
+                        if (isWhite != prevWhite)
+                        {
+                            edgePosition = x - 0.5f;
+                            foundEdge = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (foundEdge && whiteCount > blockSize / 4 && whiteCount < blockSize * 3 / 4)
+                {
+                    edgeInfo.HasEdge = true;
+                    edgeInfo.IsHorizontal = false;
+                    edgeInfo.Position = edgePosition;
+                    edgeInfo.Row = y;
+                    break;
+                }
+            }
+
+            // 检测垂直边缘（如果没有找到水平边缘）
+            if (!edgeInfo.HasEdge)
+            {
+                for (int x = 1; x < blockSize - 1; x++)
+                {
+                    int whiteCount = 0;
+                    float edgePosition = 0;
+                    bool foundEdge = false;
+
+                    for (int y = 0; y < blockSize; y++)
+                    {
+                        uint pixel = pixels[(startY + y) * stride + (startX + x)];
+                        bool isWhite = (pixel & 0xFF) > 128;
+
+                        if (isWhite) whiteCount++;
+
+                        // 检测边缘过渡
+                        if (y > 0)
+                        {
+                            uint prevPixel = pixels[(startY + y - 1) * stride + (startX + x)];
+                            bool prevWhite = (prevPixel & 0xFF) > 128;
+
+                            if (isWhite != prevWhite)
+                            {
+                                edgePosition = y - 0.5f;
+                                foundEdge = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundEdge && whiteCount > blockSize / 4 && whiteCount < blockSize * 3 / 4)
+                    {
+                        edgeInfo.HasEdge = true;
+                        edgeInfo.IsHorizontal = true;
+                        edgeInfo.Position = edgePosition;
+                        edgeInfo.Column = x;
+                        break;
+                    }
+                }
+            }
+
+            return edgeInfo;
+        }
+
+        private unsafe void ApplyEdgeAlignment(uint* pixels, int stride, int startX, int startY, int blockSize, EdgeInfo edgeInfo, float strength)
+        {
+            // 对齐到1/4像素网格（blockSize/4的倍数）
+            float gridSize = blockSize / 4.0f;
+            float alignedPosition = MathF.Round(edgeInfo.Position / gridSize) * gridSize;
+            float offset = alignedPosition - edgeInfo.Position;
+
+            // 限制调整幅度
+            offset = Math.Max(-2, Math.Min(2, offset)) * strength;
+
+            if (Math.Abs(offset) < 0.1f) return; // 调整幅度太小，跳过
+
+            // 应用边缘调整
+            if (edgeInfo.IsHorizontal)
+            {
+                // 调整垂直边缘
+                ApplyVerticalEdgeShift(pixels, stride, startX, startY, blockSize, edgeInfo.Column, offset);
+            }
+            else
+            {
+                // 调整水平边缘
+                ApplyHorizontalEdgeShift(pixels, stride, startX, startY, blockSize, edgeInfo.Row, offset);
+            }
+        }
+
+        private unsafe void ApplyVerticalEdgeShift(uint* pixels, int stride, int startX, int startY, int blockSize, int edgeCol, float offset)
+        {
+            for (int y = 0; y < blockSize; y++)
+            {
+                for (int x = Math.Max(0, edgeCol - 2); x < Math.Min(blockSize, edgeCol + 3); x++)
+                {
+                    int pixelIndex = (startY + y) * stride + (startX + x);
+                    uint originalPixel = pixels[pixelIndex];
+
+                    // 计算新的像素强度
+                    float distance = Math.Abs(x - (edgeCol + offset));
+                    float newIntensity = CalculateAdjustedIntensity(originalPixel, distance);
+
+                    // 应用新强度
+                    byte intensity = (byte)Math.Max(0, Math.Min(255, newIntensity));
+                    pixels[pixelIndex] = (uint)(intensity | (intensity << 8) | (intensity << 16) | 0xFF000000);
+                }
+            }
+        }
+
+        private unsafe void ApplyHorizontalEdgeShift(uint* pixels, int stride, int startX, int startY, int blockSize, int edgeRow, float offset)
+        {
+            for (int x = 0; x < blockSize; x++)
+            {
+                for (int y = Math.Max(0, edgeRow - 2); y < Math.Min(blockSize, edgeRow + 3); y++)
+                {
+                    int pixelIndex = (startY + y) * stride + (startX + x);
+                    uint originalPixel = pixels[pixelIndex];
+
+                    // 计算新的像素强度
+                    float distance = Math.Abs(y - (edgeRow + offset));
+                    float newIntensity = CalculateAdjustedIntensity(originalPixel, distance);
+
+                    // 应用新强度
+                    byte intensity = (byte)Math.Max(0, Math.Min(255, newIntensity));
+                    pixels[pixelIndex] = (uint)(intensity | (intensity << 8) | (intensity << 16) | 0xFF000000);
+                }
+            }
+        }
+
+        private float CalculateAdjustedIntensity(uint pixel, float distance)
+        {
+            byte originalIntensity = (byte)(pixel & 0xFF);
+
+            // 使用平滑的过渡函数
+            float factor = 1.0f - Math.Max(0, Math.Min(1, distance - 0.5f));
+            return originalIntensity * factor;
+        }
+
+        private CharacterType GetCharacterType(int charCodePoint)
+        {
+            char ch = (char)charCodePoint;
+
+            // ASCII字符分类
+            if (charCodePoint <= 127)
+            {
+                // 直线笔画字符
+                if ("EFHILT1|[]{}".Contains(ch)) return CharacterType.StraightStroke;
+
+                // 曲线笔画字符
+                if ("BCDGJOPQRS036689abcdegopqsuy()@&".Contains(ch)) return CharacterType.CurvedStroke;
+
+                // 细节字符（标点符号等）
+                if (".,;:!?'\"".Contains(ch)) return CharacterType.Detail;
+
+                // 默认为曲线笔画
+                return CharacterType.CurvedStroke;
+            }
+
+            // 中文字符分类（简化版本）
+            if (charCodePoint >= 0x4E00 && charCodePoint <= 0x9FFF)
+            {
+                // 这里可以根据具体需求添加更复杂的中文字符分类逻辑
+                // 暂时都归类为直线笔画，因为中文字符多包含横竖笔画
+                return CharacterType.StraightStroke;
+            }
+
+            // 其他字符默认为曲线笔画
+            return CharacterType.CurvedStroke;
+        }
+
+        private enum CharacterType
+        {
+            StraightStroke,  // 直线笔画
+            CurvedStroke,    // 曲线笔画
+            Detail           // 细节部分
+        }
+
+        private struct EdgeInfo
+        {
+            public bool HasEdge;
+            public bool IsHorizontal;
+            public float Position;
+            public int Row;
+            public int Column;
         }
 
         private void ApplyDirectionalSmoothing(Bitmap bmp)
