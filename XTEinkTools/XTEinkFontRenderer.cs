@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -193,8 +193,8 @@ namespace XTEinkTools
             result.SetResolution(96, 96);
 
             bool isPunct = IsPunctuationCharacter(charCodePoint);
-            // 对普通字符大幅降低阈值，提高渲染成功率
-            int adjThr = isPunct ? Math.Max(16, LightThrehold - 4) : Math.Max(32, LightThrehold - 64);
+            // 超采样阈值优化：普通字符轻微降低，标点符号保持原值
+            int adjThr = isPunct ? Math.Max(16, LightThrehold - 4) : Math.Max(LightThrehold - 16, LightThrehold * 85 / 100);
             double thrLinear = Math.Pow(adjThr / 255.0, 2.2);
 
             var srcData = grayBmp.LockBits(new Rectangle(0, 0, grayBmp.Width, grayBmp.Height),
@@ -237,13 +237,13 @@ namespace XTEinkTools
                         double avgGamma = gammaSum / cnt;
                         double avgGray = Math.Pow(avgGamma, 1.0 / 2.2) * 255;
 
-                        // 纯黑保护区
-                        if (avgGray < 24) { dstRow[x] = 0xFF000000; continue; }
+                        // 纯黑保护区（提高阈值，减少虚化）
+                        if (avgGray < 32) { dstRow[x] = 0xFF000000; continue; }
 
-                        // Bayer+clamp
+                        // Bayer+clamp（减少抖动强度，提高清晰度）
                         int bx = x & (BAYER_SIZE - 1);
                         int by = y & (BAYER_SIZE - 1);
-                        double bayer = (BayerMatrix16x16[by, bx] / 255.0 - 0.5) * 0.1;
+                        double bayer = (BayerMatrix16x16[by, bx] / 255.0 - 0.5) * 0.05; // 从0.1减少到0.05
                         double combined = Math.Max(0.02, Math.Min(0.98, thrLinear + bayer));
                         dstRow[x] = avgGamma > combined ? 0xFFFFFFFF : 0xFF000000;
                         }
