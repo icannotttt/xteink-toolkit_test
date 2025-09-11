@@ -41,6 +41,12 @@ namespace XTEinkTools
         public bool EnableSubPixelHinting { get; set; } = true;
         public float SubPixelHintingStrength { get; set; } = 0.8f;
 
+        // Lanczos 滤波器参数
+        public float LanczosRadius { get; set; } = 2.0f;           // 滤波器半径 (1.0-4.0)，越大质量越高但性能越低
+        public float LanczosSharpening { get; set; } = 1.3f;       // 锐化强度 (0.5-2.0)，越大边缘越锐利
+        public int LanczosSampleStep { get; set; } = 2;            // 采样步长 (1-4)，越小质量越高但性能越低
+        public float LanczosWeightThreshold { get; set; } = 1e-4f; // 权重阈值，跳过极小权重以提升性能
+
         #region private fields
         private Bitmap _tempRenderSurface;
         private Graphics _tempGraphics;
@@ -144,16 +150,24 @@ namespace XTEinkTools
             }
         }
 
-        // Lanczos 核函数
+        // Lanczos 核函数（支持可配置参数）
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float LanczosKernel(float x, float a)
+        private float LanczosKernel(float x, float a, float sharpening = 1.0f)
         {
             if (x == 0) return 1.0f;
             if (Math.Abs(x) >= a) return 0.0f;
 
             float pix = (float)(Math.PI * x);
             float pixOverA = pix / a;
-            return (float)(Math.Sin(pix) * Math.Sin(pixOverA) / (pix * pixOverA));
+            float result = (float)(Math.Sin(pix) * Math.Sin(pixOverA) / (pix * pixOverA));
+
+            // 应用锐化强度
+            if (sharpening != 1.0f)
+            {
+                result = (float)Math.Pow(Math.Abs(result), sharpening) * Math.Sign(result);
+            }
+
+            return result;
         }
 
         // 使用 Lanczos-2 滤波器进行高质量降采样
@@ -211,28 +225,28 @@ namespace XTEinkTools
             int centerX = blockX * ULTRA_SCALE + ULTRA_SCALE / 2;
             int centerY = blockY * ULTRA_SCALE + ULTRA_SCALE / 2;
 
-            // 使用较小的采样窗口以提高性能，同时保持质量
-            int sampleRadius = ULTRA_SCALE + ULTRA_SCALE / 2; // 1.5倍采样半径
+            // 使用可配置的采样半径
+            int sampleRadius = (int)(LanczosRadius * ULTRA_SCALE);
 
-            for (int dy = -sampleRadius; dy <= sampleRadius; dy += 2) // 每2个像素采样一次
+            for (int dy = -sampleRadius; dy <= sampleRadius; dy += LanczosSampleStep)
             {
                 int srcY = centerY + dy;
                 if (srcY < blockY * ULTRA_SCALE || srcY >= (blockY + 1) * ULTRA_SCALE) continue;
 
-                for (int dx = -sampleRadius; dx <= sampleRadius; dx += 2)
+                for (int dx = -sampleRadius; dx <= sampleRadius; dx += LanczosSampleStep)
                 {
                     int srcX = centerX + dx;
                     if (srcX < blockX * ULTRA_SCALE || srcX >= (blockX + 1) * ULTRA_SCALE) continue;
 
-                    // 计算 Lanczos 权重（使用查找表优化）
+                    // 计算 Lanczos 权重（使用可配置参数）
                     float normalizedDx = dx / (float)ULTRA_SCALE;
                     float normalizedDy = dy / (float)ULTRA_SCALE;
 
-                    float weightX = LanczosKernel(normalizedDx, 2.0f);
-                    float weightY = LanczosKernel(normalizedDy, 2.0f);
+                    float weightX = LanczosKernel(normalizedDx, LanczosRadius, LanczosSharpening);
+                    float weightY = LanczosKernel(normalizedDy, LanczosRadius, LanczosSharpening);
                     float weight = weightX * weightY;
 
-                    if (Math.Abs(weight) < 1e-4f) continue;
+                    if (Math.Abs(weight) < LanczosWeightThreshold) continue;
 
                     // 获取像素值
                     uint pixel = srcPtr[srcY * srcStride + srcX];
