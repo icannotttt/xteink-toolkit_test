@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -163,6 +163,9 @@ namespace XTEinkTools
                              emSizeInPoints, PointF.Empty, StringFormat.GenericTypographic);
 
                 using Matrix m = new();
+                // 关键修复：必须将路径按ULTRA_SCALE放大，以匹配超采样画布
+                m.Scale(ULTRA_SCALE, ULTRA_SCALE, MatrixOrder.Append);
+
                 // 先应用字体变换（垂直、间距等）
                 ApplyUltraVectorTransforms(m, targetWidth, targetHeight, ULTRA_SCALE, charCodePoint);
 
@@ -406,4 +409,3 @@ namespace XTEinkTools
         #endregion
     }
 }
-#endregion
