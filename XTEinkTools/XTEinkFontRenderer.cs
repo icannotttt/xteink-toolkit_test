@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -175,14 +175,8 @@ namespace XTEinkTools
 
                 gp.Transform(m);
 
-                if (ShouldApplyInkCompensation(charCodePoint))
-                    ApplyInkExpansionCompensation(gp, 0.05f * ULTRA_SCALE); // 0.05 mm
-
                 g.FillPath(Brushes.White, gp);
             }
-
-            if (NeedsSmoothCurveProcessing(charCodePoint))
-                ApplyDirectionalSmoothing(ultra);
 
             return ApplyBayerDithering(ultra, targetWidth, targetHeight, charCodePoint);
         }
@@ -192,10 +186,8 @@ namespace XTEinkTools
             Bitmap result = new(targetW, targetH);
             result.SetResolution(96, 96);
 
-            bool isPunct = IsPunctuationCharacter(charCodePoint);
-            // 超采样阈值优化：在可见性和清晰度之间找平衡
-            int adjThr = isPunct ? Math.Max(16, LightThrehold - 4) : Math.Max(40, LightThrehold * 2 / 3);
-            double thrLinear = Math.Pow(adjThr / 255.0, 2.2);
+            // 简化：统一使用LightThrehold，不区分字符类型
+            double thrLinear = Math.Pow(LightThrehold / 255.0, 2.2);
 
             var srcData = grayBmp.LockBits(new Rectangle(0, 0, grayBmp.Width, grayBmp.Height),
                                           System.Drawing.Imaging.ImageLockMode.ReadOnly,
@@ -217,7 +209,7 @@ namespace XTEinkTools
                         uint* dstRow = dstPtr + y * dstStride;
                         for (int x = 0; x < targetW; x++)
                         {
-                        //  gamma-先平均
+                        // Gamma校正的像素平均（保留这个，这是有意义的）
                         double gammaSum = 0;
                         int cnt = 0;
                         for (int dy = 0; dy < ULTRA_SCALE; dy++)
@@ -235,27 +227,13 @@ namespace XTEinkTools
                             }
                         }
                         double avgGamma = gammaSum / cnt;
-                        double avgGray = Math.Pow(avgGamma, 1.0 / 2.2) * 255;
 
-                        // 纯黑保护区（提高阈值，减少虚化）
-                        if (avgGray < 32) { dstRow[x] = 0xFF000000; continue; }
-
-                        // 对比度增强：使用S曲线增强对比度
-                        double contrast = avgGamma;
-                        if (contrast > 0.1 && contrast < 0.9)
-                        {
-                            // S曲线增强对比度
-                            contrast = contrast < 0.5 ?
-                                2 * contrast * contrast :
-                                1 - 2 * (1 - contrast) * (1 - contrast);
-                        }
-
-                        // Bayer+clamp（减少抖动强度，提高清晰度）
+                        // 简单的Bayer抖动
                         int bx = x & (BAYER_SIZE - 1);
                         int by = y & (BAYER_SIZE - 1);
-                        double bayer = (BayerMatrix16x16[by, bx] / 255.0 - 0.5) * 0.03; // 进一步减少到0.03
+                        double bayer = (BayerMatrix16x16[by, bx] / 255.0 - 0.5) * 0.1;
                         double combined = Math.Max(0.02, Math.Min(0.98, thrLinear + bayer));
-                        dstRow[x] = contrast > combined ? 0xFFFFFFFF : 0xFF000000;
+                        dstRow[x] = avgGamma > combined ? 0xFFFFFFFF : 0xFF000000;
                         }
                     }
                 }
