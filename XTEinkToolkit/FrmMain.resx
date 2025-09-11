@@ -838,7 +838,7 @@
     <value>9</value>
   </data>
   <data name="chkSuperSampling.Text" xml:space="preserve">
-    <value>启用32x超采样</value>
+    <value>启用8x超采样</value>
   </data>
   <data name="&gt;&gt;chkSuperSampling.Name" xml:space="preserve">
     <value>chkSuperSampling</value>

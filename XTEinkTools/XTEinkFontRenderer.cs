@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace XTEinkTools
 {
-    // 注意：SuperSampling现在使用bool控制，true=32x超采样，false=无超采样
+    // 注意：SuperSampling现在使用bool控制，true=8x超采样，false=无超采样
     public class XTEinkFontRenderer : IDisposable
     {
         public enum AntiAltasMode
@@ -51,7 +51,7 @@ namespace XTEinkTools
         private Bitmap _tempRenderSurface;
         private Graphics _tempGraphics;
         private readonly StringFormat _format = new(StringFormat.GenericTypographic);
-        private const int ULTRA_SCALE = 32;
+        private const int ULTRA_SCALE = 8;
         private const int BAYER_SIZE = 16;
 
         // 性能优化：预计算查找表
@@ -69,7 +69,7 @@ namespace XTEinkTools
         private static readonly float[] GammaToLinearLUTFloat = new float[256];
 
         // Lanczos-2 滤波器预计算表
-        private static readonly float[] LanczosLUT = new float[ULTRA_SCALE * 4 + 1]; // 支持-2到+2范围，精度为1/ULTRA_SCALE
+        private static readonly float[] LanczosLUT = new float[129]; // 固定1/32精度，支持-2到+2范围
 
         // 内存池
         private static readonly ConcurrentQueue<Bitmap> _bitmapPool = new();
@@ -142,7 +142,7 @@ namespace XTEinkTools
         // 初始化 Lanczos-2 滤波器查找表
         private static void InitializeLanczosLUT()
         {
-            float step = 1.0f / ULTRA_SCALE;
+            float step = 1.0f / 32; // 保持1/32精度，不随ULTRA_SCALE变化
             for (int i = 0; i < LanczosLUT.Length; i++)
             {
                 float x = (i - LanczosLUT.Length / 2) * step;
@@ -371,7 +371,7 @@ namespace XTEinkTools
         }
         #endregion
 
-        #region 32× ultimate super-sampling
+        #region 8× ultimate super-sampling
         private Bitmap RenderUltimateSuperSampling(int charCodePoint, int targetWidth, int targetHeight)
         {
             char chr = (char)charCodePoint;
@@ -603,7 +603,7 @@ namespace XTEinkTools
             var charType = GetCharacterType(charCodePoint);
             if (charType == CharacterType.Detail) return ultraBmp; // 细节部分不处理
 
-            // 并行处理32×32块
+            // 并行处理8×8块
             int blockSize = ULTRA_SCALE;
 
             var data = ultraBmp.LockBits(new Rectangle(0, 0, ultraBmp.Width, ultraBmp.Height),
@@ -616,7 +616,7 @@ namespace XTEinkTools
                     uint* pixels = (uint*)data.Scan0;
                     int stride = data.Stride / 4;
 
-                    // 并行处理每个目标像素对应的32×32块
+                    // 并行处理每个目标像素对应的8×8块
                     Parallel.For(0, targetH, y =>
                     {
                         for (int x = 0; x < targetW; x++)
@@ -749,9 +749,10 @@ namespace XTEinkTools
 
         private unsafe void ApplyEdgeAlignment(uint* pixels, int stride, int startX, int startY, int blockSize, EdgeInfo edgeInfo, float strength)
         {
-            // 对齐到1/4像素网格（blockSize/4的倍数）
-            float gridSize = blockSize / 4.0f;
-            float alignedPosition = (float)Math.Round(edgeInfo.Position / gridSize) * gridSize;
+            // 8×空间下，对齐到2像素网格（0,2,4,6,8）使用整数掩码优化
+            // blockSize=8时，gridSize=2，可以用位运算优化
+            int aligned = ((int)Math.Round(edgeInfo.Position * 4) & ~1); // 对齐到偶数（0,2,4,6,8）
+            float alignedPosition = aligned * 0.25f; // 转回浮点位置
             float offset = alignedPosition - edgeInfo.Position;
 
             // 限制调整幅度
