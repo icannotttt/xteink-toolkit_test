@@ -47,9 +47,21 @@ namespace XTEinkTools
         private static readonly float[] BayerLUT = new float[BAYER_SIZE * BAYER_SIZE];
         private static readonly int[] GrayWeights = { 299, 587, 114 }; // RGB到灰度的权重
 
+        // 整数Bayer抖动优化（16位定点数，精度0.0001）
+        private static readonly int[] BayerLUTInt = new int[BAYER_SIZE * BAYER_SIZE];
+        private static readonly int[] GammaToLinearLUTInt = new int[256];
+        private const int FIXED_POINT_SCALE = 10000; // 定点数缩放因子
+
         // 内存池
         private static readonly ConcurrentQueue<Bitmap> _bitmapPool = new();
         private static readonly object _poolLock = new object();
+
+        // StringFormat对象复用
+        private static readonly StringFormat _horizontalFormat = new(StringFormat.GenericTypographic);
+        private static readonly StringFormat _verticalFormat = new(StringFormat.GenericTypographic)
+        {
+            FormatFlags = StringFormatFlags.DirectionVertical
+        };
         private static readonly int[,] BayerMatrix16x16 = {
             {0,128,32,160,8,136,40,168,2,130,34,162,10,138,42,170},
             {192,64,224,96,200,72,232,104,194,66,226,98,202,74,234,106},
@@ -72,10 +84,12 @@ namespace XTEinkTools
         // 静态构造函数：初始化查找表
         static XTEinkFontRenderer()
         {
-            // 初始化Gamma查找表
+            // 初始化Gamma查找表（浮点版本）
             for (int i = 0; i < 256; i++)
             {
                 GammaToLinearLUT[i] = (float)Math.Pow(i / 255.0, 2.2);
+                // 整数版本（16位定点数）
+                GammaToLinearLUTInt[i] = (int)(GammaToLinearLUT[i] * FIXED_POINT_SCALE);
             }
 
             // 初始化反Gamma查找表（16位精度）
@@ -91,7 +105,10 @@ namespace XTEinkTools
                 for (int x = 0; x < BAYER_SIZE; x++)
                 {
                     int idx = y * BAYER_SIZE + x;
+                    // 浮点版本
                     BayerLUT[idx] = (BayerMatrix16x16[y, x] / 255.0f - 0.5f) * 0.1f;
+                    // 整数版本（16位定点数）
+                    BayerLUTInt[idx] = (int)(BayerLUT[idx] * FIXED_POINT_SCALE);
                 }
             }
         }
@@ -228,12 +245,8 @@ namespace XTEinkTools
                         g.TranslateTransform(CharSpacingPx * ULTRA_SCALE / 2f, 0);
                 }
 
-                // 使用与legacy模式相同的StringFormat
-                using StringFormat ultraFormat = new StringFormat(StringFormat.GenericTypographic);
-                if (IsVerticalFont)
-                    ultraFormat.FormatFlags |= StringFormatFlags.DirectionVertical;
-                else
-                    ultraFormat.FormatFlags &= ~StringFormatFlags.DirectionVertical;
+                // 使用预创建的StringFormat对象（性能优化）
+                StringFormat ultraFormat = IsVerticalFont ? _verticalFormat : _horizontalFormat;
 
                 // 直接使用DrawString，完全匹配legacy模式
                 g.DrawString(chr.ToString(), scaledFont, Brushes.White, 0, 0, ultraFormat);
@@ -278,8 +291,8 @@ namespace XTEinkTools
 
                         for (int x = 0; x < targetW; x++)
                         {
-                            // 快速Gamma校正像素平均（使用查找表）
-                            float gammaSum = 0f;
+                            // 整数Bayer抖动优化（完全避免浮点运算）
+                            int gammaSum = 0;
                             int srcY = y * ULTRA_SCALE;
                             int srcX = x * ULTRA_SCALE;
 
@@ -288,7 +301,7 @@ namespace XTEinkTools
                             {
                                 uint* srcRow = srcPtr + (srcY + dy) * srcStride + srcX;
 
-                                // 处理所有像素
+                                // 处理所有像素（整数运算）
                                 for (int dx = 0; dx < ULTRA_SCALE; dx++)
                                 {
                                     uint c = srcRow[dx];
@@ -296,17 +309,23 @@ namespace XTEinkTools
                                     int gray = (int)(((c >> 16) & 0xFF) * 299 +
                                                     ((c >> 8) & 0xFF) * 587 +
                                                     (c & 0xFF) * 114) / 1000;
-                                    gammaSum += GammaToLinearLUT[gray];
+                                    gammaSum += GammaToLinearLUTInt[gray];
                                 }
                             }
 
-                            float avgGamma = gammaSum / ultraScale2;
+                            int avgGamma = gammaSum / ultraScale2;
 
-                            // 优化的Bayer抖动（使用预计算查找表）
+                            // 整数Bayer抖动（使用定点数运算）
                             int bayerX = x & (BAYER_SIZE - 1);
                             int bayerIdx = bayerY * BAYER_SIZE + bayerX;
-                            float bayer = BayerLUT[bayerIdx];
-                            float combined = Math.Max(0.02f, Math.Min(0.98f, thrLinear + bayer));
+                            int bayer = BayerLUTInt[bayerIdx];
+                            int thrLinearInt = GammaToLinearLUTInt[LightThrehold];
+                            int combined = thrLinearInt + bayer;
+
+                            // 边界检查（定点数）
+                            int minThr = (int)(0.02f * FIXED_POINT_SCALE);
+                            int maxThr = (int)(0.98f * FIXED_POINT_SCALE);
+                            combined = Math.Max(minThr, Math.Min(maxThr, combined));
 
                             dstRow[x] = avgGamma > combined ? 0xFFFFFFFF : 0xFF000000;
                         }
