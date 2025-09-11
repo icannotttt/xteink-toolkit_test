@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
@@ -196,7 +196,8 @@ namespace XTEinkTools
                     g.DrawRectangle(Pens.White, 0, 0, ultraW - 1, ultraH - 1);
 
                 using GraphicsPath gp = new();
-                // 使用像素大小而不是点大小，确保字体大小正确
+                // 使用与Font对象相同的em size，确保字体大小一致
+                // 直接使用Font.Size，它已经是像素单位
                 float emSizeInPixels = Font.Size;
 
                 gp.AddString(chr.ToString(), Font.FontFamily, (int)Font.Style,
