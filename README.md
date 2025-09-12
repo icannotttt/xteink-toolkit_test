@@ -1,6 +1,6 @@
 # 阅星曈电纸书相关C#代码库
 
-> 本项目 Fork 自 [ZTYFDroid/xteink-toolkit](https://gitee.com/ZTYFDroid/xteink-toolkit/)  
+> 本项目 Fork 自 [ZTYFDroid/xteink-toolkit](https://gitee.com/ZYFDroid/xteink-toolkit)  
 > 原作者：ZTYFDroid
 >
 一些倒腾阅星曈电子书时编写的代码，目前有以下功能：
