@@ -457,7 +457,7 @@ namespace XTEinkTools
                 float hintingStrength = charType switch
                 {
                     CharacterType.StraightStroke => SubPixelHintingStrength,      // 直线笔画：强对齐
-                    CharacterType.CurvedStroke => SubPixelHintingStrength * 0.2f, // 曲线笔画：轻度对齐
+                    CharacterType.CurvedStroke => SubPixelHintingStrength * 0.6f, // 曲线笔画：轻度对齐
                     _ => 0f
                 };
 
