@@ -465,7 +465,6 @@ namespace XTEinkTools
                 {
                     ApplyEdgeAlignment(pixels, stride, startX, startY, blockSize, edgeInfo, hintingStrength);
                 }
-                RemoveIsolatedPixels(pixels, stride, startX, startY, blockSize);
             }
         }
 
