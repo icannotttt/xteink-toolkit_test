@@ -36,9 +36,9 @@ namespace XTEinkTools
         public float SubPixelHintingStrength { get; set; } = 0.8f;
 
         // Lanczos 滤波器参数
-        public float LanczosRadius { get; set; } = 2.0f;           // 滤波器半径 (1.0-4.0)，越大质量越高但性能越低
+        public float LanczosRadius { get; set; } = 4.0f;           // 滤波器半径 (1.0-4.0)，越大质量越高但性能越低
         public float LanczosSharpening { get; set; } = 1.3f;       // 锐化强度 (0.5-2.0)，越大边缘越锐利
-        public int LanczosSampleStep { get; set; } = 2;            // 采样步长 (1-4)，越小质量越高但性能越低
+        public int LanczosSampleStep { get; set; } = 1;            // 采样步长 (1-4)，越小质量越高但性能越低
         public float LanczosWeightThreshold { get; set; } = 1e-4f; // 权重阈值，跳过极小权重以提升性能
 
         #region private fields
@@ -101,7 +101,7 @@ namespace XTEinkTools
                 for (int x = 0; x < BAYER_SIZE; x++)
                 {
                     int idx = y * BAYER_SIZE + x;
-                    BayerLUTFloat[idx] = (BayerMatrix16x16[y, x] / 255.0f - 0.5f) * 0.08f; // 稍微减小抖动强度
+                    BayerLUTFloat[idx] = (BayerMatrix16x16[y, x] / 255.0f - 0.5f) * 0.01f; // 稍微减小抖动强度
                 }
             }
 
@@ -457,7 +457,7 @@ namespace XTEinkTools
                 float hintingStrength = charType switch
                 {
                     CharacterType.StraightStroke => SubPixelHintingStrength,      // 直线笔画：强对齐
-                    CharacterType.CurvedStroke => SubPixelHintingStrength * 0.5f, // 曲线笔画：轻度对齐
+                    CharacterType.CurvedStroke => SubPixelHintingStrength * 0.2f, // 曲线笔画：轻度对齐
                     _ => 0f
                 };
 
