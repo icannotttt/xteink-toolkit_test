@@ -386,7 +386,7 @@ namespace XTEinkTools
                             float bayer = BayerLUTFloat[bayerIdx];
 
                             // 超采样模式下让字体稍微浅一点（亮一点）
-                            int compensatedThreshold = Math.Min(255, LightThrehold + 15);
+                            int compensatedThreshold = Math.Min(255, LightThrehold + 8);
                             float thrLinear = GammaToLinearLUTFloat[compensatedThreshold];
                             float combined = thrLinear + bayer;
 
@@ -465,6 +465,7 @@ namespace XTEinkTools
                 {
                     ApplyEdgeAlignment(pixels, stride, startX, startY, blockSize, edgeInfo, hintingStrength);
                 }
+                RemoveIsolatedPixels(pixels, stride, startX, startY, blockSize);
             }
         }
 
