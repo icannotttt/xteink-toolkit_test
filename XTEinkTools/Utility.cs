@@ -36,13 +36,17 @@ namespace XTEinkTools
             
         }
 
-        public static void LoadFromBitmap(this XTEinkFontBinary font, int charCode, Bitmap bmp, int sx = 0, int sy = 0, int threhold = 128) {
+        public static void LoadFromBitmap(this XTEinkFontBinary font, int charCode, Bitmap bmp, int sx = 0, int sy = 0)
+        {
             for (int y = 0; y < font.Height; y++)
             {
                 for (int x = 0; x < font.Width; x++)
                 {
-                    bool isOn = bmp.GetPixel(x + sx, y + sy).G > threhold;
-                    font.SetPixel(charCode, x, y,isOn);
+                    // 取绿色通道值转换为灰阶等级（0-3）
+                    int gray = bmp.GetPixel(x + sx, y + sy).G;
+                    int grayLevel = gray / (256 / GRAY_LEVELS);
+                    grayLevel = Math.Clamp(grayLevel, 0, 3);
+                    font.SetPixel(charCode, x, y, grayLevel);
                 }
             }
         }
