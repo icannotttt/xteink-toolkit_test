@@ -34,6 +34,10 @@ namespace XTEinkTools
         public bool EnableUltimateSuperSampling { get; set; } = false;
         public bool EnableSubPixelHinting { get; set; } = true;
         public float SubPixelHintingStrength { get; set; } = 0.8f;
+        // 灰阶配置（2bit = 4级灰阶）
+        private const int GRAY_LEVELS = 4;          // 4级灰阶
+        private const int GRAY_LEVEL_BITS = 2;      // 每个像素占用2bit
+        private const int GRAY_THRESHOLD = 256 / GRAY_LEVELS; // 每个灰阶对应的亮度阈值
 
         // Lanczos 滤波器参数
         public float LanczosRadius { get; set; } = 4.0f;           // 滤波器半径 (1.0-4.0)，越大质量越高但性能越低
@@ -356,11 +360,11 @@ namespace XTEinkTools
             result.SetResolution(96, 96);
 
             var srcData = grayBmp.LockBits(new Rectangle(0, 0, grayBmp.Width, grayBmp.Height),
-                                          System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                          System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                                  ImageLockMode.ReadOnly,
+                                  PixelFormat.Format32bppArgb);
             var dstData = result.LockBits(new Rectangle(0, 0, targetW, targetH),
-                                          System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                                          System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                                  ImageLockMode.WriteOnly,
+                                  PixelFormat.Format32bppArgb);
             try
             {
                 unsafe
@@ -377,30 +381,29 @@ namespace XTEinkTools
 
                         for (int x = 0; x < targetW; x++)
                         {
-                            // 使用Lanczos-2降采样算法
+                            // 保持原Lanczos采样逻辑
                             float avgGamma = ApplyOptimizedLanczosDownsampling(srcPtr, srcStride, x, y);
-
-                            // 高精度浮点Bayer抖动
+                    
+                            // 4灰阶Bayer抖动计算
                             int bayerX = x & (BAYER_SIZE - 1);
                             int bayerIdx = bayerY * BAYER_SIZE + bayerX;
-                            float bayer = BayerLUTFloat[bayerIdx];
-
-                            // 超采样模式下让字体稍微浅一点（亮一点）
-                            int compensatedThreshold = Math.Min(255, LightThrehold + 8);
-                            float thrLinear = GammaToLinearLUTFloat[compensatedThreshold];
-                            float combined = thrLinear + bayer;
-
-                            // 边界检查（浮点数）
-                            combined = Math.Max(0.02f, Math.Min(0.98f, combined));
-
-                            dstRow[x] = avgGamma > combined ? 0xFFFFFFFF : 0xFF000000;
+                            // 调整Bayer抖动范围适配4灰阶（-0.5到+0.5之间）
+                            float bayer = (BayerMatrix16x16[bayerY, bayerX] / 255.0f - 0.5f) * (1.0f / GRAY_LEVELS);
+                    
+                            // 计算灰阶等级（0-3）
+                            float combined = avgGamma + bayer;
+                            int grayLevel = (int)Math.Clamp(Math.Round(combined * GRAY_LEVELS), 0, GRAY_LEVELS - 1);
+                    
+                            // 转换为RGB值（灰阶值=等级*64，因为256/4=64）
+                            byte intensity = (byte)(grayLevel * GRAY_THRESHOLD);
+                            dstRow[x] = (uint)(intensity | (intensity << 8) | (intensity << 16) | 0xFF000000);
                         }
                     }
                 }
             }
             finally
             {
-                grayBmp.UnlockBits(srcData);
+               grayBmp.UnlockBits(srcData);
                 result.UnlockBits(dstData);
             }
             return result;
@@ -625,10 +628,18 @@ namespace XTEinkTools
         private float CalculateAdjustedIntensity(uint pixel, float distance)
         {
             byte originalIntensity = (byte)(pixel & 0xFF);
+            // 转换为灰阶等级（0-3）
+            int originalGrayLevel = originalIntensity / GRAY_THRESHOLD;
 
-            // 使用平滑的过渡函数
-            float factor = 1.0f - Math.Max(0, Math.Min(1, distance - 0.5f));
-            return originalIntensity * factor;
+            // 灰阶模式下更平滑的过渡曲线
+            float factor = 1.0f - (float)Math.Pow(Math.Max(0, distance - 0.2f), 1.2);
+            factor = Math.Max(0, Math.Min(1, factor));
+
+            // 按灰阶等级计算新强度（确保落在4个等级范围内）
+            int newGrayLevel = (int)Math.Round(originalGrayLevel * factor);
+            newGrayLevel = Math.Clamp(newGrayLevel, 0, GRAY_LEVELS - 1);
+    
+            return newGrayLevel * GRAY_THRESHOLD;
         }
 
         private CharacterType GetCharacterType(int charCodePoint)
